@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from typing import Callable
+from utils import plot_trajectories as plot_trajectories_from_history
 
 
 class Langevin_sim:
@@ -153,3 +153,30 @@ class Langevin_sim:
             "r": self.r.copy(),
             "n": self.n.copy(),
         }
+
+    def plot_trajectories(
+        self,
+        r_history: np.ndarray | None = None,
+        n_show: int = 50,
+        ax=None,
+        title: str = "Trajectories (subset)",
+        show: bool = True,
+        **kwargs,
+    ):
+        """Plot a subset of trajectories from stored history or supplied results."""
+        if r_history is None:
+            if not self.is_history:
+                raise ValueError(
+                    "Trajectory history is not enabled. Pass r_history explicitly or "
+                    "initialize the simulator with is_history=True."
+                )
+            r_history = self.r_history[: self._history_index + 1]
+
+        return plot_trajectories_from_history(
+            r_history=r_history,
+            n_show=n_show,
+            ax=ax,
+            title=title,
+            show=show,
+            **kwargs,
+        )
