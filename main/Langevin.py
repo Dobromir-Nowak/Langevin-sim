@@ -1,10 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from typing import Callable
+
+
 class Langevin_sim:
     def __init__(
         self,
         config: dict,
+        I_fn: Callable[[np.ndarray],np.ndarray],
+        f_fn: Callable[[np.ndarray],np.ndarray],
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
         is_history: bool = True
@@ -27,12 +32,16 @@ class Langevin_sim:
         self.Nt = config["Nt"]
         self.N = config["N"]
 
+        # callable functions (light intensity and angular velocity)
+        self.f_fn = f_fn
+        self.I_fn = I_fn
+
         # default intial conditions
-        if r0 is not None:
-            r0 = np.zeros((self.dim, self.N))
-        if n0 is not None: 
-            n0 = np.zeros((self.dim, self.N))
-            n0[0,:]= 1
+        if r0 is None:
+            r0 = np.zeros((self.dim, self.N), dtype=float)
+        if n0 is None:
+            n0 = np.zeros((self.dim, self.N), dtype=float)
+            n0[0, :] = 1.0
         self.r0 = r0
         self.n0 = n0
 
@@ -50,41 +59,73 @@ class Langevin_sim:
             self.r0 = r_new
         if n_new is not None:
             self.n0 = n_new
-        
-        self.r =  self.r0  # positions
-        self.n = self.n0   # orientations
+
+        self.r = np.array(self.r0, dtype=float, copy=True)
+        self.n = np.array(self.n0, dtype=float, copy=True)
+        self._normalize_orientations()
 
         # definition and reset of history (optional)
         if self.is_history:
             self.r_history = np.zeros((self.Nt+1, self.dim, self.N))
-            self.r_history[0,:] = self.r0
+            self.r_history[0, :] = self.r
 
             self.n_history = np.zeros((self.Nt+1, self.dim, self.N))
-            self.n_history[0,:] = self.n0
+            self.n_history[0, :] = self.n
 
+        self._history_index = 0
 
+    def _normalize_orientations(self)->None:
+        norms = np.linalg.norm(self.n, axis=0)
+        zero_mask = norms == 0.0
+        if np.any(zero_mask):
+            raise ValueError(
+                f"Zero-norm orientation vectors detected at indices "
+                f"{np.where(zero_mask)[0]}")
+        self.n /= norms
 
-    # TODO continue implementation from here
     # ------------------------
     # Dynamics
     # ------------------------
+
+    def Omega(self,psi):  # I, psi have to have the same shape
+        I_vals = self.I_fn(self.r)
+        if I_vals.shape != psi.shape:
+            raise ValueError(f"I_vals shape {I_vals.shape} != psi shape {psi.shape}")
+        x=I_vals*np.sin(psi) 
+        return self.f_fn(x)  # same shape as x -- (1, self.N)
+
     def step(self):
         """One time step update."""
-        noise = np.sqrt(2 * self.D * self.dt) * np.random.randn(self.N)
+        if self.w0 != 0.:
+            vec_I = self.vec_I[:, None]
+            dot_prod = np.sum(self.n*(-vec_I), axis=0, keepdims=True)
+            psi = np.arccos(dot_prod)  # r,n -- (self.dim, self.N), psi -- (1, self.N)
+            omega_values = self.w0*self.Omega(psi)
+            dn_rot = omega_values*self.dt*(-vec_I -dot_prod*self.n)
+            self.n += dn_rot
 
-        self.theta += noise
-        direction = np.stack([np.cos(self.theta), np.sin(self.theta)], axis=1)
+        if self.D_r != 0.:
+            dn_noise = np.sqrt(2.*self.D_r*self.dt) * np.random.randn(self.dim, self.N)
+            dn_noise -= self.n*np.sum(self.n*dn_noise, axis=0, keepdims=True) 
+            self.n += dn_noise
 
-        self.x += self.v0 * direction * self.dt
+        self._normalize_orientations()
+
+        self.r += self.v0*self.dt*self.n # deterministic step
+        if self.D != 0.:
+            self.r += np.sqrt(2.*self.D*self.dt) * np.random.randn(self.dim, self.N)
 
     # ------------------------
     # Simulation loop
     # ------------------------
     def run(self, save_every=1):
-        for t in range(self.n_steps):
+        if save_every <= 0:
+            raise ValueError("save_every must be a positive integer")
+
+        for t in range(self.Nt):
             self.step()
 
-            if t % save_every == 0:
+            if t % save_every==0:
                 self.record()
 
         return self.get_results()
@@ -93,11 +134,22 @@ class Langevin_sim:
     # Utilities
     # ------------------------
     def record(self):
-        self.x_history.append(self.x.copy())
-        self.theta_history.append(self.theta.copy())
+        if not self.is_history:
+            return
+
+        self._history_index += 1
+        self.r_history[self._history_index, :] = self.r
+        self.n_history[self._history_index, :] = self.n
 
     def get_results(self):
+        if self.is_history:
+            end = self._history_index + 1
+            return {
+                "r": self.r_history[:end],
+                "n": self.n_history[:end],
+            }
+
         return {
-            "x": np.array(self.x_history),
-            "theta": np.array(self.theta_history),
+            "r": self.r.copy(),
+            "n": self.n.copy(),
         }

@@ -1,3 +1,7 @@
-def load_config():
-    # TODO implement YAML loading from directory here
-    return 0
+from pathlib import Path
+import yaml
+
+def load_config() -> dict:
+    path = Path(__file__).parent/ "config.yaml"
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
