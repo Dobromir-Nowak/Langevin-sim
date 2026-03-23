@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-def load_config() -> dict:
-    path = Path(__file__).parent / "config.yaml"
+def load_config(file_name: str) -> dict:
+    path = Path(__file__).parent / f"{file_name}.yaml"
     with open(path, "r") as f:
         return yaml.safe_load(f)
 

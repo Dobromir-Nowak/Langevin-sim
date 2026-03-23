@@ -45,6 +45,9 @@ class Langevin_sim:
         self.r0 = r0
         self.n0 = n0
 
+        # default geometry/bc
+        self.geometry = None
+
         # --- state ---
         self.is_history = is_history
         self.reset_and_initialize_state()
@@ -96,6 +99,7 @@ class Langevin_sim:
 
     def step(self):
         """One time step update."""
+        r_old = self.r.copy()
         if self.w0 != 0.:
             vec_I = self.vec_I[:, None]
             dot_prod = np.sum(self.n*(-vec_I), axis=0, keepdims=True)
@@ -115,6 +119,8 @@ class Langevin_sim:
         if self.D != 0.:
             self.r += np.sqrt(2.*self.D*self.dt) * np.random.randn(self.dim, self.N)
 
+        if self.geometry is not None:
+            self.r = self.geometry.apply(r_old, self.r)
     # ------------------------
     # Simulation loop
     # ------------------------
