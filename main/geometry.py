@@ -14,8 +14,8 @@ class Cylinder3D:
     # positive outside, negative inside domain 
     def grad_phi(self, r): # r.shape=(dim, N)
         x, y, z = r[0,:], r[1,:], r[2,:]
-        r = np.sqrt(x**2 + y**2 + z**2)
-        phi_radial = r - self.R
+        rho = np.sqrt(x**2 + y**2)
+        phi_radial = rho - self.R
         phi_top = z - self.zmax
         phi_bottom = -z + self.zmin
 
@@ -40,8 +40,8 @@ class Cylinder3D:
     
     def phi_only(self, r): # r.shape=(dim, N)
         x, y, z = r[0,:], r[1,:], r[2,:]
-        r = np.sqrt(x**2 + y**2 + z**2)
-        phi_radial = r - self.R
+        rho = np.sqrt(x**2 + y**2)
+        phi_radial = rho - self.R
         phi_top = z - self.zmax
         phi_bottom = -z + self.zmin
 
@@ -54,7 +54,7 @@ class Cylinder3D:
     def apply(self, r_old, r_new):
         phi_old, phi_new = self.phi_only(r_old), self.phi_only(r_new)
 
-        if_outside = (phi_old <=0) & (phi_new>0)
+        if_outside = (phi_new>0)
         
         grad = self.grad_phi(r_old)
         # bounceback implementation
