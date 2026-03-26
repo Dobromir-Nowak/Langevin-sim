@@ -24,6 +24,7 @@ def plot_trajectories(
     start_size: float = 10.0,
     end_size: float = 12.0,
     show: bool = True,
+    aspect_ratio: tuple[float, float, float] | None = None
 ):
     """Plot a subset of trajectories from a history array."""
     r_history = np.asarray(r_history)
@@ -107,7 +108,7 @@ def plot_trajectories(
         ax.grid(True, alpha=0.2)
     else:
         ax.set_zlabel("z")
-
+        ax.set_box_aspect(aspect_ratio)
     if show and created_figure:
         plt.show()
 

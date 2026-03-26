@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Callable
 from utils import plot_trajectories as plot_trajectories_from_history
-
+from tqdm import tqdm
 
 class Langevin_sim:
     def __init__(
@@ -120,7 +120,7 @@ class Langevin_sim:
             self.r += np.sqrt(2.*self.D*self.dt) * np.random.randn(self.dim, self.N)
 
         if self.geometry is not None:
-            self.r = self.geometry.apply(r_old, self.r)
+            self.geometry.apply(r_old, self.r)
     # ------------------------
     # Simulation loop
     # ------------------------
@@ -128,7 +128,7 @@ class Langevin_sim:
         if save_every <= 0:
             raise ValueError("save_every must be a positive integer")
 
-        for t in range(self.Nt):
+        for t in tqdm(range(self.Nt)):
             self.step()
 
             if t % save_every==0:
