@@ -2,15 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-
-
-# TODO adjust imports
-from utils import load_config
-from Langevin import Langevin_sim
-from geometry import Cylinder3D
+from langevin_sim.utils import load_config
+from langevin_sim.langevin import Langevin_sim
+from langevin_sim.geometry import Cylinder3D
 
 # Load plot style
-parent_dir = Path(__file__).parent
+parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
 # Approximation of f2-f1
@@ -27,7 +24,6 @@ I_fn = I_identity
 
 file_name = "config_Cylinder3D"
 config = load_config(file_name=file_name)
-
 
 
 # Run simulation

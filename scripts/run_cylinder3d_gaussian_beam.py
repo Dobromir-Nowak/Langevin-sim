@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# from utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
-# from Langevin import Langevin_sim
-# from geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
+from langevin_sim.langevin import Langevin_sim
+from langevin_sim.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
 
 # Load plot style
-parent_dir = Path(__file__).parent
+parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
 
@@ -19,7 +19,6 @@ sigma_beam = config["sigma_beam"]
 def f(x):
     return 0.3*np.sin(x)  # f2-f1 #TODO implement better approximation or original functions
                           # 0.3 comes from f2-f1 approximation
-
 
 f_fn = f
 I_fn = I_identity # make_I_Gaussian_beam(config)
