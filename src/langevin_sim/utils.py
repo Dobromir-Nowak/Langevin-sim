@@ -6,7 +6,7 @@ import numpy as np
 import yaml
 
 def load_config(file_name: str) -> dict:
-    path = Path(__file__).parent / "configs" / f"{file_name}.yaml"
+    path = Path(__file__).resolve().parents[2] / "configs" / f"{file_name}.yaml"
     with open(path, "r") as f:
         return yaml.safe_load(f)
 

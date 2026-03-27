@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
+import sys
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = PROJECT_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
-
-# TODO adjust imports
-from utils import load_config
-from Langevin import Langevin_sim
-from geometry import Cylinder3D
+from langevin_sim import Cylinder3D, Langevin_sim, load_config
 
 # Load plot style
 parent_dir = Path(__file__).parent
@@ -34,5 +35,5 @@ config = load_config(file_name=file_name)
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
-r, n = sim.run()
+results = sim.run()
 sim.plot_trajectories()

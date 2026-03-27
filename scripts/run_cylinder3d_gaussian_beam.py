@@ -1,10 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
+import sys
 
-# from utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
-# from Langevin import Langevin_sim
-# from geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = PROJECT_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from langevin_sim import (
+    Cylinder3D,
+    I_identity,
+    Langevin_sim,
+    load_config,
+    plot_hist_rho,
+    plot_hist_z,
+    random_initial_conditions_Cylinder3D,
+)
 
 # Load plot style
 parent_dir = Path(__file__).parent
