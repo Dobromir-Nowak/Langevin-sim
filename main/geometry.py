@@ -29,6 +29,32 @@ def random_initial_conditions_Cylinder3D(config: dict):
     return r_init, n_init
 
 
+def const_initial_conditions_Cylinder3D(
+    config: dict,
+    r: np.ndarray,
+    n: np.ndarray
+    ):
+    
+    dim = config["dim"]
+    N = config["N"]
+    zmin = config["zmin"]
+    zmax = config["zmax"]
+    R = config["R_cylinder"]
+
+    # Initial positions within the cylinder
+    x = radius_rand*np.cos(phi_rand)
+    y = radius_rand*np.sin(phi_rand)
+    z = z_rand
+    r_init = np.concatenate((x,y,z))
+    r_init = r_init.reshape((dim,N))
+
+    # Initial orientations within the cylinder
+    n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
+    n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+    return r_init, n_init
+
+
+
 class Cylinder3D:
     def __init__(
             self,
