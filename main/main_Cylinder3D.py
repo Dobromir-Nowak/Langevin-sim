@@ -16,10 +16,10 @@ def f(x):
                           # 0.3 comes from f2-f1 approximation
 
 # Light intensity field
-def I(r): # r - positions to check field at:
+def I_identity(r): # r - positions to check field at:
     return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
 f_fn = f
-I_fn = I
+I_fn = I_identity
 
 
 file_name = "config_Cylinder3D"
@@ -31,5 +31,5 @@ config = load_config(file_name=file_name)
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
-results = sim.run()
+r, n = sim.run()
 sim.plot_trajectories()

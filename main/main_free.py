@@ -24,5 +24,5 @@ config = load_config("config_free")
 
 # Run simulation 
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
-results = sim.run()
+r, n = sim.run()
 sim.plot_trajectories()

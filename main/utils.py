@@ -10,6 +10,39 @@ def load_config(file_name: str) -> dict:
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
+# Gaussian beam light intensity field
+def make_I_Gaussian_beam(config):
+    sigma_beam = config["sigma_beam"]
+    def I_Gaussian_beam(r): # r - positions to check field at:
+        x, y = r[0,:], r[1,:]
+        return np.exp(-(x**2 + y**2)/(2*sigma_beam**2))[None,:] # has to return shape (1, r.shape[1]), r.shape[1] = N
+    return I_Gaussian_beam
+
+# Unit light intensity field
+def I_identity(r): # r - positions to check field at:
+    return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
+
+
+
+def plot_hist_rho(
+    rho: np.ndarray,
+    bins: int = 40
+    ):
+    plt.hist(rho, bins = bins)
+    plt.xlabel(fr"$\rho$")
+    plt.ylabel("counts")
+    plt.show()
+
+def plot_hist_z(
+    z: np.ndarray,
+    bins: int = 40
+    ):
+    plt.hist(z, bins=40)
+    plt.xlabel(fr"$z$")
+    plt.ylabel("counts")
+    plt.show()
+
+
 
 def plot_trajectories(
     r_history: np.ndarray,

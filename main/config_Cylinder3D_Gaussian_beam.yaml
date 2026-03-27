@@ -10,8 +10,8 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.01 # time step
-Nt: 20000 # number of time steps
-N: 100 # number of samples/ABPs
+Nt: 10000 # number of time steps
+N: 1000 # number of samples/ABPs
 
 # Gaussian beam parameters
 sigma_beam: 2. # width of the Gaussian beam

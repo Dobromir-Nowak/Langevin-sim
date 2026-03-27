@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from utils import load_config
+from utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
 from Langevin import Langevin_sim
 from geometry import Cylinder3D, random_initial_conditions_Cylinder3D
 
@@ -20,12 +20,9 @@ def f(x):
     return 0.3*np.sin(x)  # f2-f1 #TODO implement better approximation or original functions
                           # 0.3 comes from f2-f1 approximation
 
-# Light intensity field
-def I(r): # r - positions to check field at:
-    x, y = r[0,:], r[1,:]
-    return np.exp(-(x**2 + y**2)/(2*sigma_beam**2))[None,:] # has to return shape (1, r.shape[1]), r.shape[1] = N
+
 f_fn = f
-I_fn = I
+I_fn = I_identity # make_I_Gaussian_beam(config)
 
 
 # Run simulation
@@ -35,5 +32,14 @@ sim.reset_and_initialize_state(r_new=r_init, n_new=n_init)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
 results = sim.run()
-sim.plot_trajectories(n_show=config["N"], aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
+
+# Final results
+r, n = results["r"], results["n"]
+x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
+rho = np.sqrt(x**2+y**2)
+
+# Plotting
+plot_hist_rho(rho)
+plot_hist_z(z)
+sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
 # sim.plot_trajectories(n_show=config["N"]) # Version with no scalling
