@@ -4,6 +4,16 @@ from typing import Callable
 from utils import plot_trajectories as plot_trajectories_from_history
 from tqdm import tqdm
 
+
+
+import numpy as np
+
+from typing import Callable
+from tqdm import tqdm
+
+#TODO
+from .utils import plot_trajectories as plot_trajectories_from_history
+
 class Langevin_sim:
     def __init__(
         self,
