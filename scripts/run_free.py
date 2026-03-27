@@ -2,9 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from utils import load_config
-from Langevin import Langevin_sim
-from geometry import make_geometry_mask
+
+
+from langevin_sim.geometry import Cylinder3D
+
+# from langevin_sim.geometry import Cylinder3D
+
+from langevin_sim.utils import load_config
+from langevin_sim import langevin
+from langevin_sim.geometry import make_geometry_mask
 
 # Load plot style
 parent_dir = Path(__file__).parent

@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
-from Langevin import Langevin_sim
-from geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+# from utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
+# from Langevin import Langevin_sim
+# from geometry import Cylinder3D, random_initial_conditions_Cylinder3D
 
 # Load plot style
 parent_dir = Path(__file__).parent
