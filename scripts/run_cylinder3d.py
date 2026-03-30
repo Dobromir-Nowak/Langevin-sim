@@ -27,8 +27,13 @@ config = load_config(file_name=file_name)
 
 
 # Initial conditions
-r_const = np.array([0,0,0.99],dtype=float)
-n_const = np.array([0,0,1],dtype=float)
+# r_const = np.array([0,0,0.9],dtype=float)
+# n_const = np.array([0,0,1],dtype=float)
+
+r_const = 0.95*np.array([6,8,1],dtype=float)
+n_const = np.sqrt(2)*np.array([0.6,0.8,0],dtype=float) + np.sqrt(2)*np.array([0,0,1])
+
+
 r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 # Run simulation
@@ -38,7 +43,6 @@ geometry = Cylinder3D(config=config)
 sim.geometry = geometry
 results = sim.run()
 
-print(results)
 # Final results
 r, n = results["r"], results["n"]
 x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]

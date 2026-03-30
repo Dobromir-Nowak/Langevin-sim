@@ -2,7 +2,10 @@
 import numpy as np
 from typing import Callable
 
-
+def reflect_orientation(n:np.ndarray, n_normal:np.ndarray):
+    n_copy = np.copy(n)
+    n_copy = n_copy - 2*n_normal * np.sum(n*n_normal,axis=0)
+    return n_copy
 
 def random_initial_conditions_Cylinder3D(config: dict):
     
@@ -105,10 +108,10 @@ class Cylinder3D:
 
         return phi
 
-    def apply(self, r_old, r_new):
+    def apply(self, r_old, r_new, n):
         """
-        r_old, r_new: shape (3, N)
-        modifies r_new
+        r_old, r_new, n: shape (3, N)
+        modifies r_new and n
         returns None
         """
         current_start = np.array(r_old, dtype=float, copy=True)
@@ -121,8 +124,9 @@ class Cylinder3D:
 
             start = current_start[:, if_outside]
             end = r_new[:, if_outside]
-            hit, normal, hit_mask = self._first_boundary_hit(start, end)
-
+            n_selected = n[:, if_outside]
+            hit, normal, hit_mask = self._first_boundary_hit(start, end, n_selected)
+            n[:,if_outside] = n_selected
             if not np.all(hit_mask):
                 # Fallback for numerically degenerate segments: keep particle at
                 # the last known valid position instead of amplifying it.
@@ -147,7 +151,7 @@ class Cylinder3D:
         if np.any(if_outside):
             self._project_inside(r_new[:, if_outside])
 
-    def _first_boundary_hit(self, r_old, r_new):
+    def _first_boundary_hit(self, r_old, r_new, n_selected):
         """Return first boundary hit along each segment from r_old to r_new."""
         npts = r_old.shape[1]
         dr = r_new - r_old
@@ -163,6 +167,7 @@ class Cylinder3D:
             idx = np.where(top_mask)[0][valid]
             s_best[idx] = s_top[valid]
             normal[2, idx] = 1.0
+            n_selected[-1,idx] = -n_selected[-1,idx]
 
         # Bottom plane z = zmin
         bottom_mask = (dz < 0) & (r_old[2] >= self.zmin) & (r_new[2] < self.zmin)
@@ -175,6 +180,7 @@ class Cylinder3D:
             s_best[idx] = s_bottom[valid][better]
             normal[:, idx] = 0.0
             normal[2, idx] = -1.0
+            n_selected[-1,idx] = -n_selected[-1,idx]
 
         # Radial wall x^2 + y^2 = R^2
         dx = dr[0]
@@ -206,7 +212,8 @@ class Cylinder3D:
             normal[:, idx] = 0.0
             normal[0, idx] = hit[0] / rho
             normal[1, idx] = hit[1] / rho
-
+            n_reflected = reflect_orientation(n_selected[:,idx], normal[:,idx])
+            n_selected[:,idx] = n_reflected # modify n with normal
         hit_mask = np.isfinite(s_best)
         hit = r_old[:, hit_mask] + s_best[hit_mask] * dr[:, hit_mask]
         normal_hit = normal[:, hit_mask]

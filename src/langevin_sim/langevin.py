@@ -125,7 +125,7 @@ class Langevin_sim:
             self.r += np.sqrt(2.*self.D*self.dt) * np.random.randn(self.dim, self.N)
 
         if self.geometry is not None:
-            self.geometry.apply(r_old, self.r)  #TODO -- test with grad: self.geometry.apply(r_old, self.r)
+            self.geometry.apply(r_old, self.r, self.n)
     # ------------------------
     # Simulation loop
     # ------------------------
