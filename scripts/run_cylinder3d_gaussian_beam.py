@@ -21,7 +21,7 @@ def f(x):
                           # 0.3 comes from f2-f1 approximation
 
 f_fn = f
-I_fn = I_identity # make_I_Gaussian_beam(config)
+I_fn = make_I_Gaussian_beam(config)
 
 
 # Run simulation

@@ -46,7 +46,7 @@ class Langevin_sim:
             r0 = np.zeros((self.dim, self.N), dtype=float)
         if n0 is None:
             n0 = np.zeros((self.dim, self.N), dtype=float)
-            n0[0, :] = 1.0
+            n0[-1, :] = 1.0
         self.r0 = r0
         self.n0 = n0
 

@@ -9,8 +9,8 @@ w0: 1. # scale of angular velocity
 vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
-dt: 0.01 # time step
-Nt: 2000 # number of time steps
+dt: 0.1 # time step
+Nt: 5000 # number of time steps
 N: 100 # number of samples/ABPs
 
 # Cylinder parameters
