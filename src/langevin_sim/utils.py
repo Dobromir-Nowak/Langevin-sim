@@ -68,7 +68,9 @@ def plot_trajectories(
     start_size: float = 10.0,
     end_size: float = 12.0,
     show: bool = True,
-    aspect_ratio: tuple[float, float, float] | None = None
+    aspect_ratio: tuple[float, float, float] | None = None, 
+    show_cylinder: bool = False,
+    config: dict | None = None,
 ):
     """Plot a subset of trajectories from a history array."""
     r_history = np.asarray(r_history)
@@ -82,6 +84,15 @@ def plot_trajectories(
         raise ValueError("r_history must contain at least one time point and one particle")
     if dim not in (2, 3):
         raise ValueError(f"Only 2D or 3D trajectory plots are supported; got dim={dim}")
+    if show_cylinder:
+        if dim != 3:
+            raise ValueError("Cylinder plotting only supported for 3D")
+        if config is None:
+            raise ValueError("cylinder_config must be provided when show_cylinder=True")
+        required_keys = ["R_cylinder", "zmin", "zmax"]
+        for k in required_keys:
+            if k not in config:
+                raise ValueError(f"Missing '{k}' in cylinder_config")
 
     n_show = min(max(int(n_show), 1), n_particles)
     idx = np.linspace(0, n_particles - 1, n_show, dtype=int)
@@ -95,6 +106,26 @@ def plot_trajectories(
             ax = fig.add_subplot(111, projection="3d")
     else:
         fig = ax.figure
+
+    if show_cylinder:
+        R = config["R_cylinder"]
+        zmin = config["zmin"]
+        zmax = config["zmax"]
+
+        theta = np.linspace(0, 2*np.pi, 60)
+        z = np.linspace(zmin, zmax, 30)
+        theta_grid, z_grid = np.meshgrid(theta, z)
+
+        x = R * np.cos(theta_grid)
+        y = R * np.sin(theta_grid)
+
+        ax.plot_surface(
+            x, y, z_grid,
+            alpha=0.05,          # very faint
+            linewidth=0,
+            antialiased=True
+        )
+
 
     for i in idx:
         if dim == 2:

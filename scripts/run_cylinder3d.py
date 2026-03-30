@@ -27,11 +27,11 @@ config = load_config(file_name=file_name)
 
 
 # Initial conditions
-# r_const = np.array([0,0,0.9],dtype=float)
-# n_const = np.array([0,0,1],dtype=float)
+r_const = np.array([0,0,0.9],dtype=float)
+n_const = np.array([0,0,1],dtype=float)
 
-r_const = 0.95*np.array([6,8,1],dtype=float)
-n_const = np.sqrt(2)*np.array([0.6,0.8,0],dtype=float) + np.sqrt(2)*np.array([0,0,1])
+# r_const = 0.95*np.array([6,8,1],dtype=float)
+# n_const = np.sqrt(2)*np.array([0.6,0.8,0],dtype=float) + np.sqrt(2)*np.array([0,0,1])
 
 
 r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
@@ -51,4 +51,5 @@ rho = np.sqrt(x**2+y**2)
 # Plotting
 # plot_hist_rho(rho)
 # plot_hist_z(z)
-sim.plot_trajectories(aspect_ratio = [1,1,1])
+# sim.plot_trajectories(aspect_ratio = [1,1,1])
+sim.plot_trajectories(aspect_ratio = [1,1,1], show_cylinder=True, config=config)
