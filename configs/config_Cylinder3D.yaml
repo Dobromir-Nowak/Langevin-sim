@@ -10,8 +10,8 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.1 # time step
-Nt: 5000 # number of time steps
-N: 100 # number of samples/ABPs
+Nt: 1 # number of time steps
+N: 1 # number of samples/ABPs
 
 # Cylinder parameters
 R_cylinder: 10. # radius of the cylinder

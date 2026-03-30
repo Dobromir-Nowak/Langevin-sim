@@ -140,7 +140,7 @@ class Cylinder3D:
 
             r_new[:, active] = hit + reflected
             current_start[:, active] = hit
-
+            
         # Final clamp for any particle still marginally outside after repeated
         # reflections, which can happen only from roundoff near edges/corners.
         if_outside = self.phi_only(r_new) > 0

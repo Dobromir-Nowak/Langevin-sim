@@ -53,7 +53,7 @@ class Cylinder3D:
     def grad_phi_all(self, r): # r.shape=(dim, N)
         return 
 
-    def apply_template(self, r_old, r_new):
+    def apply_template(self, r_old, r_new, n):
         phi_old, phi_new = self.phi_only(r_old), self.phi_only(r_new)
 
         if_outside = (phi_new>0)
@@ -63,10 +63,10 @@ class Cylinder3D:
         r_new = ... # reference
 
 
-    def apply(self, r_old, r_new):
+    def apply(self, r_old, r_new, n):
             """
-            r_old, r_new: shape (3, N)
-            modifies r_new
+            r_old, r_new, n: shape (3, N)
+            modifies r_new and n
             returns None
             """
             phi_old, phi_new = self.phi_only(r_old), self.phi_only(r_new)

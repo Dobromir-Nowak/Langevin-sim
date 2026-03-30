@@ -23,6 +23,17 @@ def I_identity(r): # r - positions to check field at:
     return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
 
 
+def const_initial_conditions(config: dict, r_const: np.ndarray, n_const: np.ndarray):
+    N=config["N"]
+    dim=config["dim"]
+    if dim!=r_const.shape[0] or dim!=n_const.shape[0]:
+        raise ValueError("Wrong array dimensions")
+    
+    r_init = r_const[:,None]*np.ones(N)
+    n_init = n_const[:,None]*np.ones(N)
+    return r_init, n_init
+
+
 
 def plot_hist_rho(
     rho: np.ndarray,
