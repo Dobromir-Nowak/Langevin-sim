@@ -31,7 +31,7 @@ sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
 sim.reset_and_initialize_state(r_new=r_init, n_new=n_init)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
-results = sim.run()
+results = sim.run(save_every=10000)
 
 # Final results
 r, n = results["r"], results["n"]

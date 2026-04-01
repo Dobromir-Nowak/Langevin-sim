@@ -14,6 +14,6 @@ Nt: 5 # number of time steps
 N: 20 # number of samples/ABPs
 
 # Cylinder parameters
-R_cylinder: 10. # radius of the cylinder
+R_cylinder: 100. # radius of the cylinder
 zmin: 0. # minimum z-coordinate of the cylinder
-zmax: 1. # maximum z-coordinate of the cylinder
+zmax: 10. # maximum z-coordinate of the cylinder

@@ -9,11 +9,11 @@ w0: 1. # scale of angular velocity
 vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
-dt: 0.01 # time step
-Nt: 5000 # number of time steps
-N: 10 # number of samples/ABPs
+dt: 0.1 # time step
+Nt: 50000 # number of time steps
+N: 1000 # number of samples/ABPs
 
 # Cylinder parameters
-R_cylinder: 10. # radius of the cylinder
+R_cylinder: 5000. # radius of the cylinder
 zmin: 0. # minimum z-coordinate of the cylinder
-zmax: 1. # maximum z-coordinate of the cylinder
+zmax: 100. # maximum z-coordinate of the cylinder

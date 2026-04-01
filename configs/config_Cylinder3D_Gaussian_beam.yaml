@@ -14,9 +14,9 @@ Nt: 10000 # number of time steps
 N: 1000 # number of samples/ABPs
 
 # Gaussian beam parameters
-sigma_beam: 2. # width of the Gaussian beam
+sigma_beam: 300. # width of the Gaussian beam
 
 # Cylinder parameters
-R_cylinder: 10. # radius of the cylinder
+R_cylinder: 5000. # radius of the cylinder
 zmin: 0. # minimum z-coordinate of the cylinder
-zmax: 1. # maximum z-coordinate of the cylinder
+zmax: 100. # maximum z-coordinate of the cylinder
