@@ -4,7 +4,7 @@ D: 0. # translational diffusion coefficient
 
 # Parameters
 dim: 3 # dimension of the problem
-v0: 1. # ABP speed
+v0: 10. # ABP speed
 w0: 1. # scale of angular velocity
 vec_I: [0., 0., -1.] # light direction (unit vector)
 
