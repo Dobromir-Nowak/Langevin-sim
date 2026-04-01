@@ -41,46 +41,44 @@ class Langevin_sim:
         self.f_fn = f_fn
         self.I_fn = I_fn
 
-        # default intial conditions
+        # Intial conditions
+        # default
         if r0 is None:
             r0 = np.zeros((self.dim, self.N), dtype=float)
         if n0 is None:
             n0 = np.zeros((self.dim, self.N), dtype=float)
             n0[-1, :] = 1.0
+        # or custom
         self.r0 = r0
         self.n0 = n0
+        
+        # Initializing state
+        self.r = np.array(self.r0, dtype=float, copy=True)
+        self.n = np.array(self.n0, dtype=float, copy=True)
 
         # default geometry/bc
         self.geometry = None
 
         # --- state ---
         self.is_history = is_history
-        self.reset_and_initialize_state()
 
-    def reset_and_initialize_state(
+
+    def allocate_history(
         self,
-        r_new: np.ndarray | None = None,
-        n_new: np.ndarray | None = None   
+        save_every: int = 1
     )->None:
-        """Initialize / reset system state."""
-        if r_new is not None:
-            self.r0 = r_new
-        if n_new is not None:
-            self.n0 = n_new
+        if not self.is_history:
+            return
+        self.save_every = save_every
+        n_save = self.Nt // save_every + 1
 
-        self.r = np.array(self.r0, dtype=float, copy=True)
-        self.n = np.array(self.n0, dtype=float, copy=True)
-        self._normalize_orientations()
+        self.r_history = np.zeros((n_save, self.dim, self.N))
+        self.n_history = np.zeros((n_save, self.dim, self.N))
 
-        # definition and reset of history (optional)
-        if self.is_history:
-            self.r_history = np.zeros((self.Nt+1, self.dim, self.N))
-            self.r_history[0, :] = self.r
+        self.r_history[0] = self.r
+        self.n_history[0] = self.n
 
-            self.n_history = np.zeros((self.Nt+1, self.dim, self.N))
-            self.n_history[0, :] = self.n
-
-        self._history_index = 0
+        self.history_index = 0
 
     def _normalize_orientations(self)->None:
         norms = np.linalg.norm(self.n, axis=0)
@@ -132,29 +130,33 @@ class Langevin_sim:
     def run(self, save_every=1):
         if save_every <= 0:
             raise ValueError("save_every must be a positive integer")
-
-        for t in tqdm(range(self.Nt)):
+        self.allocate_history(save_every=save_every)
+        for t in tqdm(range(1,self.Nt+1)):
             self.step()
 
             if t % save_every==0:
                 self.record()
 
+        if self.Nt % save_every != 0: # saving the final state if unsaved after the iteration loop
+            self.record()
         return self.get_results()
 
     # ------------------------
     # Utilities
     # ------------------------
-    def record(self):
+    def record(self):  # TODO adjust logic
         if not self.is_history:
             return
+        if self.history_index + 1 >= self.r_history.shape[0]:
+            raise RuntimeError("History buffer overflow (check save_every vs Nt)")
 
-        self._history_index += 1
-        self.r_history[self._history_index, :] = self.r
-        self.n_history[self._history_index, :] = self.n
+        self.history_index += 1
+        self.r_history[self.history_index, :] = self.r
+        self.n_history[self.history_index, :] = self.n
 
     def get_results(self):
         if self.is_history:
-            end = self._history_index + 1
+            end = self.history_index + 1
             return {
                 "r": self.r_history[:end],
                 "n": self.n_history[:end],
@@ -181,7 +183,7 @@ class Langevin_sim:
                     "Trajectory history is not enabled. Pass r_history explicitly or "
                     "initialize the simulator with is_history=True."
                 )
-            r_history = self.r_history[: self._history_index + 1]
+            r_history = self.r_history[: self.history_index + 1]
 
         return plot_trajectories_from_history(
             r_history=r_history,

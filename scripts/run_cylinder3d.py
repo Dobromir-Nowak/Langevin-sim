@@ -25,13 +25,13 @@ config = load_config(file_name=file_name)
 
 # Initial conditions
 r_init, n_init = random_initial_conditions_Cylinder3D(config)
+# r_init, n_init = None, None # for default initialization
 
 # Run simulation
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
-sim.reset_and_initialize_state(r_new=r_init, n_new=n_init)
+sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
-results = sim.run(save_every=10000)
+results = sim.run(save_every=1)
 
 # Final results
 r, n = results["r"], results["n"]

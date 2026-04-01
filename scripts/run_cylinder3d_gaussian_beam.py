@@ -25,9 +25,8 @@ I_fn = make_I_Gaussian_beam(config)
 
 
 # Run simulation
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
 r_init, n_init = random_initial_conditions_Cylinder3D(config)
-sim.reset_and_initialize_state(r_new=r_init, n_new=n_init)
+sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init)
 geometry = Cylinder3D(config=config)
 sim.geometry = geometry
 results = sim.run()
