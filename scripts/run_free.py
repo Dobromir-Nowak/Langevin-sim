@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 from langevin_sim.geometry import Cylinder3D
-from langevin_sim.utils import load_config
+from langevin_sim.utils import load_config, I_identity
 from langevin_sim.langevin import Langevin_sim
 
 # Load plot style
@@ -15,11 +15,8 @@ def f(x):
     return 0.3*np.sin(x)  # f2-f1 #TODO implement better approximation or original functions
                           # 0.3 comes from f2-f1 approximation
 
-# Light intensity field
-def I(r): # r - positions to check field at:
-    return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
 f_fn = f
-I_fn = I
+I_fn = I_identity
 config = load_config("config_free")
 
 # Run simulation 

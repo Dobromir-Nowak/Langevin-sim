@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, const_initial_conditions
+from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, const_initial_conditions, I_identity
 from langevin_sim.langevin import Langevin_sim
 from langevin_sim.geometry import Cylinder3D
 
@@ -15,16 +15,12 @@ def f(x):
     return 0.3*np.sin(x)  # f2-f1 #TODO implement better approximation or original functions
                           # 0.3 comes from f2-f1 approximation
 
-# Light intensity field
-def I_identity(r): # r - positions to check field at:
-    return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
 f_fn = f
 I_fn = I_identity
 
 
 file_name = "config_Cylinder3D_debugging"
 config = load_config(file_name=file_name)
-
 
 # Initial conditions
 r_const = np.array([0,0,0.9],dtype=float)

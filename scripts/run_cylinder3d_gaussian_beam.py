@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam, I_identity
+from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, make_I_Gaussian_beam
 from langevin_sim.langevin import Langevin_sim
 from langevin_sim.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
 
