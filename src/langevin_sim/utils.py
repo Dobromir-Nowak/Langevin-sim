@@ -10,6 +10,20 @@ def load_config(file_name: str) -> dict:
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
+
+# Compute and print mean orientation
+def compute_mean_n(n:np.ndarray)->np.ndarray:
+    n_av = np.sum(n[-1,:], axis=-1)/n.shape[-1]
+    print(f"Population averaged orientation n:\n {n_av}\n")
+    return n_av
+
+def compute_autocorr_n(n:np.ndarray)->np.ndarray:
+    n_last = n[-1,:]
+    autocorr = np.tensordot(n_last,n_last,axes=(1,1))/n.shape[-1]
+    print(f"Population average of nn tensor:\n {autocorr}\n")
+    return autocorr
+
+
 # Gaussian beam light intensity field
 def make_I_Gaussian_beam(config):
     sigma_beam = config["sigma_beam"]
