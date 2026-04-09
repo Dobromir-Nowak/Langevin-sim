@@ -14,7 +14,7 @@ class Langevin_sim:
         self,
         config: dict,
         I_fn: Callable[[np.ndarray],np.ndarray],
-        f_fn: Callable[[np.ndarray],np.ndarray],
+        f_fn: Callable[[np.ndarray, np.ndarray],np.ndarray],
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
         is_history: bool = True
@@ -93,12 +93,11 @@ class Langevin_sim:
     # Dynamics
     # ------------------------
 
-    def Omega(self,psi):  # I, psi have to have the same shape
+    def Omega(self,sin_psi):  # I, psi have to have the same shape
         I_vals = self.I_fn(self.r)
-        if I_vals.shape != psi.shape:
-            raise ValueError(f"I_vals shape {I_vals.shape} != psi shape {psi.shape}")
-        x=I_vals*np.sin(psi) 
-        return self.f_fn(x)  # same shape as x -- (1, self.N)
+        if I_vals.shape != sin_psi.shape:
+            raise ValueError(f"I_vals shape {I_vals.shape} != psi shape {sin_psi.shape}")
+        return self.f_fn(I_vals, sin_psi)  # same shape as x -- (1, self.N)
 
     def step(self):
         """One time step update."""
@@ -106,8 +105,8 @@ class Langevin_sim:
         if self.w0 != 0.:
             vec_I = self.vec_I[:, None]
             dot_prod = np.sum(self.n*(-vec_I), axis=0, keepdims=True)
-            psi = np.arccos(dot_prod)  # r,n -- (self.dim, self.N), psi -- (1, self.N)
-            omega_values = self.w0*self.Omega(psi)
+            sin_psi = dot_prod # r,n -- (self.dim, self.N), sin_psi -- (1, self.N)
+            omega_values = self.w0*self.Omega(sin_psi)
             dn_rot = omega_values*self.dt*(-vec_I -dot_prod*self.n)
             self.n += dn_rot
 

@@ -10,12 +10,12 @@ from langevin_sim.langevin import Langevin_sim
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
-# Approximation of f2-f1
-def f(x):
-    return 0.3*np.sin(x)  # f2-f1 #TODO implement better approximation or original functions
-                          # 0.3 comes from f2-f1 approximation
+# Approximation of exact integrals
+def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3
+    return (np.pi-2)*I/2 - I**2 * sin_psi / 3 + (3*np.pi - 4)/24 * I**3 * sin_psi**2
 
-f_fn = f
+
+f_fn = f_new
 I_fn = I_identity
 config = load_config("config_free")
 
