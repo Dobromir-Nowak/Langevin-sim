@@ -58,6 +58,26 @@ def plot_hist_rho(
     plt.ylabel("counts")
     plt.show()
 
+
+def plot_density_rho(
+    rho: np.ndarray,
+    bins: int = 40
+    ):
+    counts, edges = np.histogram(rho, bins=bins, range=(0,rho.max()))
+    N_counts = len(rho)
+
+    # bin centers and width
+    rho_centers = 0.5 * (edges[:-1] + edges[1:])
+    width = edges[1] - edges[0]
+    # computing density
+    density = counts / (N_counts * 2*np.pi*rho_centers*width)
+
+    plt.bar(rho_centers, density, width=width, align='center')
+    plt.xlabel(fr"$\rho$")
+    plt.ylabel("cell density")
+    plt.show()
+
+
 def plot_hist_z(
     z: np.ndarray,
     bins: int = 40

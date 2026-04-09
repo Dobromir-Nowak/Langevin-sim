@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, const_initial_conditions, I_identity
+from langevin_sim.utils import load_config, plot_hist_rho, plot_density_rho, plot_hist_z, const_initial_conditions, I_identity
 from langevin_sim.utils import compute_mean_n, compute_autocorr_n
 from langevin_sim.langevin import Langevin_sim
 from langevin_sim.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
@@ -44,7 +44,7 @@ _ = compute_autocorr_n(n)
 
 # Plotting
 # sim.plot_trajectories(aspect_ratio = [1,1,1])
-# sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
+sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
 
-plot_hist_rho(rho)
+plot_density_rho(rho) # plot_hist_rho(rho)
 plot_hist_z(z)

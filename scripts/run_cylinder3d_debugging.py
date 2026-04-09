@@ -46,5 +46,4 @@ rho = np.sqrt(x**2+y**2)
 # Plotting
 # plot_hist_rho(rho)
 # plot_hist_z(z)
-# sim.plot_trajectories(aspect_ratio = [1,1,1])
-sim.plot_trajectories(aspect_ratio = [1,1,1], show_cylinder=True, config=config)
+sim.plot_trajectories(aspect_ratio = [1,1,1])
