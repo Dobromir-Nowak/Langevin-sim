@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Callable
 from tqdm import tqdm
-from .utils import plot_trajectories as plot_trajectories_from_history
+from langevin_sim.plotting.plots import plot_trajectories as plot_trajectories_from_history
 
 
 

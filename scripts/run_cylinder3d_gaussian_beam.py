@@ -2,9 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils import load_config, plot_hist_rho, plot_density_rho, plot_hist_z, make_I_Gaussian_beam
-from langevin_sim.langevin import Langevin_sim
-from langevin_sim.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+from langevin_sim.utils.compute import make_I_Gaussian_beam
+from langevin_sim.utils.other import load_config
+from langevin_sim.plotting.plots import plot_density_rho, plot_hist_z
+
+from langevin_sim.physics.langevin import Langevin_sim
+from langevin_sim.physics.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+
 
 # Load plot style
 parent_dir = Path(__file__).parent.parent
@@ -36,7 +40,7 @@ x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 rho = np.sqrt(x**2+y**2)
 
 # Plotting
-plot_density_rho(rho) # plot_hist_rho(rho)
+plot_density_rho(rho)
 plot_hist_z(z)
 sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
 
