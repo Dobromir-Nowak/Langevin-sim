@@ -19,7 +19,7 @@ f_fn = f_new
 I_fn = I_identity
 
 
-file_name = "config_Cylinder3D"
+file_name = "Cylinder3D"
 config = load_config(file_name=file_name)
 
 

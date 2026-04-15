@@ -11,7 +11,7 @@ parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
 
-file_name = "config_Cylinder3D_Gaussian_beam"
+file_name = "Cylinder3D_Gaussian_beam"
 config = load_config(file_name=file_name)
 sigma_beam = config["sigma_beam"]
 

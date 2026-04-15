@@ -11,10 +11,7 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 # Simulation parameters
 dt: 0.1 # time step
 Nt: 10000 # number of time steps
-N: 1000 # number of samples/ABPs
-
-# Gaussian beam parameters
-sigma_beam: 300. # width of the Gaussian beam
+N: 16000 # number of samples/ABPs
 
 # Cylinder parameters
 R_cylinder: 5000. # radius of the cylinder

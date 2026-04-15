@@ -17,7 +17,9 @@ def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3
 
 f_fn = f_new
 I_fn = I_identity
-config = load_config("config_free")
+
+file_name = "free"
+config = load_config(file_name=file_name)
 
 # Run simulation 
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
