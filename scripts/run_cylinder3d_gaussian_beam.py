@@ -5,6 +5,7 @@ from pathlib import Path
 from langevin_sim.utils.compute import make_I_Gaussian_beam
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_density_rho, plot_hist_z
+from langevin_sim.io.results import ResultsManager
 
 from langevin_sim.physics.langevin import Langevin_sim
 from langevin_sim.physics.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
@@ -16,8 +17,13 @@ plt.style.use(parent_dir / "softmatter.mplstyle")
 
 
 file_name = "Cylinder3D_Gaussian_beam"
-config = load_config(file_name=file_name)
+config_path = Path("configs") / f"{file_name}.yaml"
+config = load_config(config_path=config_path)
+
 sigma_beam = config["sigma_beam"]
+
+rm = ResultsManager(config_path=config_path)
+
 
 # Approximation of exact integrals
 def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3

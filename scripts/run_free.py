@@ -4,6 +4,8 @@ from pathlib import Path
 
 from langevin_sim.utils.compute import I_identity
 from langevin_sim.utils.other import load_config
+from langevin_sim.io.results import ResultsManager
+
 from langevin_sim.physics.langevin import Langevin_sim
 
 
@@ -20,8 +22,13 @@ def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3
 f_fn = f_new
 I_fn = I_identity
 
+
 file_name = "free"
-config = load_config(file_name=file_name)
+config_path = Path("configs") / f"{file_name}.yaml"
+config = load_config(config_path=config_path)
+
+rm = ResultsManager(config_path=config_path)
+
 
 # Run simulation 
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn)
