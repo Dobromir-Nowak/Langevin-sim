@@ -1,9 +1,9 @@
 import numpy as np
 
-from typing import Callable
+from typing import Callable, Optional
 from tqdm import tqdm
 from langevin_sim.plotting.plots import plot_trajectories as plot_trajectories_from_history
-
+from langevin_sim.physics.geometry import Cylinder3D
 
 
 
@@ -17,7 +17,8 @@ class Langevin_sim:
         f_fn: Callable[[np.ndarray, np.ndarray],np.ndarray],
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
-        is_history: bool = True
+        is_history: bool = True,
+        geometry: Cylinder3D | None = None
     )->None:
 
         # constants
@@ -56,12 +57,11 @@ class Langevin_sim:
         self.r = np.array(self.r0, dtype=float, copy=True)
         self.n = np.array(self.n0, dtype=float, copy=True)
 
-        # default geometry/bc
-        self.geometry = None
-
         # --- state ---
         self.is_history = is_history
 
+        # --- geometry ---
+        self.geometry = geometry
 
     def allocate_history(
         self,

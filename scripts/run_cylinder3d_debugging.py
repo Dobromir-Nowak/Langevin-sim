@@ -2,9 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils import load_config, plot_hist_rho, plot_hist_z, const_initial_conditions, I_identity
-from langevin_sim.langevin import Langevin_sim
-from langevin_sim.geometry import Cylinder3D
+from langevin_sim.utils.compute import const_initial_conditions, I_identity
+from langevin_sim.utils.other import load_config
+from langevin_sim.plotting.plots import plot_density_rho, plot_hist_rho, plot_hist_z
+
+from langevin_sim.physics.langevin import Langevin_sim
+from langevin_sim.physics.geometry import Cylinder3D
 
 # Load plot style
 parent_dir = Path(__file__).parent.parent
@@ -33,9 +36,8 @@ n_const = np.array([0,0,1],dtype=float)
 r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 # Run simulation
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init)
 geometry = Cylinder3D(config=config)
-sim.geometry = geometry
+sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry)
 results = sim.run()
 
 # Final results

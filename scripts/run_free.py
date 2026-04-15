@@ -2,9 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.geometry import Cylinder3D
-from langevin_sim.utils import load_config, I_identity
-from langevin_sim.langevin import Langevin_sim
+from langevin_sim.utils.compute import I_identity
+from langevin_sim.utils.other import load_config
+from langevin_sim.physics.langevin import Langevin_sim
+
+
 
 # Load plot style
 parent_dir = Path(__file__).parent.parent
