@@ -20,7 +20,7 @@ class ResultsManager:
             shutil.copy(config_path, self.root / config_path.name)
 
     def save_plot(self, fig, name):
-        fig.savefig(self.plots / f"{name}.png", dpi=600)
+        fig.savefig(self.plots / f"{name}.pdf")
 
     def save_npz(self, name, **arrays):
         np.savez(self.data / f"{name}.npz", **arrays)

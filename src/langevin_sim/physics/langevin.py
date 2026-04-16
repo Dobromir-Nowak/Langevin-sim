@@ -4,7 +4,7 @@ from typing import Callable, Optional
 from tqdm import tqdm
 from langevin_sim.plotting.plots import plot_trajectories as plot_trajectories_from_history
 from langevin_sim.physics.geometry import Cylinder3D
-
+from langevin_sim.io.results import ResultsManager
 
 
 # from .utils import plot_trajectories as plot_trajectories_from_history
@@ -17,8 +17,8 @@ class Langevin_sim:
         f_fn: Callable[[np.ndarray, np.ndarray],np.ndarray],
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
-        is_history: bool = True,
-        geometry: Cylinder3D | None = None
+        geometry: Cylinder3D | None = None,
+        results_manager: ResultsManager | None = None
     )->None:
 
         # constants
@@ -57,18 +57,16 @@ class Langevin_sim:
         self.r = np.array(self.r0, dtype=float, copy=True)
         self.n = np.array(self.n0, dtype=float, copy=True)
 
-        # --- state ---
-        self.is_history = is_history
-
         # --- geometry ---
         self.geometry = geometry
 
+        # --- results manager ---
+        self.results_manager = results_manager
+
     def allocate_history(
         self,
-        save_every: int = 1
+        save_every: int
     )->None:
-        if not self.is_history:
-            return
         self.save_every = save_every
         n_save = self.Nt // save_every + 1
 
@@ -126,26 +124,36 @@ class Langevin_sim:
     # ------------------------
     # Simulation loop
     # ------------------------
-    def run(self, save_every=1):
+    # is_history - are intermediate states stored in ram
+    # save - is history (or final state) saved to file
+    def run(self, save_every=1, is_history: bool = True, save: bool = False):
+        self.is_history = is_history
+
         if save_every <= 0:
             raise ValueError("save_every must be a positive integer")
-        self.allocate_history(save_every=save_every)
+        if self.is_history:
+            self.allocate_history(save_every=save_every)
+
         for t in tqdm(range(1,self.Nt+1)):
             self.step()
 
-            if t % save_every==0:
+            if self.is_history and t % save_every==0:
                 self.record()
-
         if self.Nt % save_every != 0: # saving the final state if unsaved after the iteration loop
             self.record()
-        return self.get_results()
+    
+        results = self.get_results()
+        if save and self.results_manager is not None: # save results with manager
+            if self.is_history: 
+                self.results_manager.save_npz("trajectories", **results)
+            else:
+                self.results_manager.save_npz("final_state", **results)
+        return results
 
     # ------------------------
     # Utilities
     # ------------------------
-    def record(self):  # TODO adjust logic
-        if not self.is_history:
-            return
+    def record(self):
         if self.history_index + 1 >= self.r_history.shape[0]:
             raise RuntimeError("History buffer overflow (check save_every vs Nt)")
 
@@ -184,11 +192,13 @@ class Langevin_sim:
                 )
             r_history = self.r_history[: self.history_index + 1]
 
-        return plot_trajectories_from_history(
+        fig, ax = plot_trajectories_from_history(
             r_history=r_history,
             n_show=n_show,
             ax=ax,
             title=title,
             show=show,
-            **kwargs,
-        )
+            **kwargs)
+        if self.results_manager is not None:
+            self.results_manager.save_plot(fig, "trajectories")
+        return fig

@@ -26,7 +26,7 @@ file_name = "Cylinder3D_debugging"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 
-results_manager = ResultsManager(config_path=config_path, tag = "test_run")
+rm = ResultsManager(config_path=config_path, tag = "debugging")
 
 # Initial conditions
 r_const = np.array([0,0,0.9],dtype=float)
@@ -40,8 +40,8 @@ r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_cons
 
 # Run simulation
 geometry = Cylinder3D(config=config)
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry)
-results = sim.run()
+sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
+results = sim.run(save_every=1, is_history=True,save=False)
 
 # Final results
 r, n = results["r"], results["n"]
@@ -49,6 +49,7 @@ x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 rho = np.sqrt(x**2+y**2)
 
 # Plotting
-# plot_hist_rho(rho)
-# plot_hist_z(z)
+rm.save_plot(plot_hist_rho(rho), name="hist_rho")
+rm.save_plot(plot_density_rho(rho), name= "density_rho")
+rm.save_plot(plot_hist_z(z), name = "hist_z")
 sim.plot_trajectories(aspect_ratio = [1,1,1])

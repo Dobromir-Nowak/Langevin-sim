@@ -5,17 +5,21 @@ import numpy as np
 
 def plot_hist_rho(
     rho: np.ndarray,
-    bins: int = 40
+    bins: int = 40, 
+    show: bool = True
     ):
-    plt.hist(rho, bins = bins)
-    plt.xlabel(fr"$\rho$")
-    plt.ylabel("counts")
-    plt.show()
-
+    fig, ax = plt.subplots()
+    ax.hist(rho, bins = bins)
+    ax.set_xlabel(fr"$\rho$")
+    ax.set_ylabel("counts")
+    if show:
+        plt.show()
+    return fig
 
 def plot_density_rho(
     rho: np.ndarray,
-    bins: int = 40
+    bins: int = 40,
+    show: bool = True
     ):
     counts, edges = np.histogram(rho, bins=bins, range=(0,rho.max()))
     N_counts = len(rho)
@@ -26,20 +30,27 @@ def plot_density_rho(
     # computing density
     density = counts / (N_counts * 2*np.pi*rho_centers*width)
 
-    plt.bar(rho_centers, density, width=width, align='center')
-    plt.xlabel(fr"$\rho$")
-    plt.ylabel("cell density")
-    plt.show()
+    fig, ax = plt.subplots()
+    ax.bar(rho_centers, density, width=width, align='center')
+    ax.set_xlabel(fr"$\rho$")
+    ax.set_ylabel("cell density")
+    if show:
+        plt.show()
+    return fig
 
 
 def plot_hist_z(
     z: np.ndarray,
-    bins: int = 40
+    bins: int = 40,
+    show: bool = True
     ):
-    plt.hist(z, bins=40)
-    plt.xlabel(fr"$z$")
-    plt.ylabel("counts")
-    plt.show()
+    fig, ax = plt.subplots()
+    ax.hist(z, bins=bins)
+    ax.set_xlabel(fr"$z$")
+    ax.set_ylabel("counts")
+    if show:
+        plt.show()
+    return fig
 
 
 

@@ -27,7 +27,7 @@ file_name = "Cylinder3D"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 
-rm = ResultsManager(config_path=config_path)
+rm = ResultsManager(config_path=config_path, tag="cylinder3d")
 
 
 # Initial conditions
@@ -36,7 +36,7 @@ r_init, n_init = random_initial_conditions_Cylinder3D(config)
 
 # Run simulation
 geometry = Cylinder3D(config=config)
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry)
+sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
 results = sim.run(save_every=10000)
 
 # Final results
@@ -48,8 +48,9 @@ _ = compute_mean_n(n)
 _ = compute_autocorr_n(n)
 
 # Plotting
+
+rm.save_plot(plot_density_rho(rho), name="density_rho") # plot_hist_rho(rho)
+rm.save_plot(plot_hist_rho(rho), name="hist_rho")
+rm.save_plot(plot_hist_z(z), name="hist_z")
 # sim.plot_trajectories(aspect_ratio = [1,1,1])
 sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
-
-plot_density_rho(rho) # plot_hist_rho(rho)
-plot_hist_z(z)
