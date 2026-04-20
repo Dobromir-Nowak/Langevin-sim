@@ -14,7 +14,7 @@ Nt: 1000000 # number of time steps
 N: 16000 # number of samples/ABPs
 
 # Gaussian beam parameters
-sigma_beam: 1500. # width of the Gaussian beam
+sigma_beam: 300. # width of the Gaussian beam
 
 # Cylinder parameters
 R_cylinder: 5000. # radius of the cylinder

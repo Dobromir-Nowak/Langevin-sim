@@ -37,7 +37,7 @@ I_fn = make_I_Gaussian_beam(config)
 r_init, n_init = random_initial_conditions_Cylinder3D(config)
 geometry = Cylinder3D(config=config)
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-results = sim.run(save_every=10000)
+results = sim.run(save_every=100000)
 
 # Final results
 r, n = results["r"], results["n"]
