@@ -42,6 +42,43 @@ def const_initial_conditions(config: dict, r_const: np.ndarray, n_const: np.ndar
     return r_init, n_init
 
 
+def const_initial_conditions_split(
+    config: dict,
+    r_const_1: np.ndarray,
+    n_const_1: np.ndarray,
+    r_const_2: np.ndarray,
+    n_const_2: np.ndarray,
+):
+    N = config["N"]
+    dim = config["dim"]
+    if (
+        dim != r_const_1.shape[0]
+        or dim != n_const_1.shape[0]
+        or dim != r_const_2.shape[0]
+        or dim != n_const_2.shape[0]
+    ):
+        raise ValueError("Wrong array dimensions")
+    if N % 2 != 0:
+        raise ValueError("const_initial_conditions_split requires an even N")
+
+    half_N = N // 2
+    r_init = np.concatenate(
+        (
+            r_const_1[:, None] * np.ones(half_N),
+            r_const_2[:, None] * np.ones(half_N),
+        ),
+        axis=1,
+    )
+    n_init = np.concatenate(
+        (
+            n_const_1[:, None] * np.ones(half_N),
+            n_const_2[:, None] * np.ones(half_N),
+        ),
+        axis=1,
+    )
+    return r_init, n_init
+
+
 # Approximation of exact integrals
 # old approximation:
 def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3

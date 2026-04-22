@@ -20,8 +20,6 @@ file_name = "Cylinder3D_Gaussian_beam"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 
-sigma_beam = config["sigma_beam"]
-
 rm = ResultsManager(config_path=config_path, tag="cylinder3d_gaussian_beam")
 
 
