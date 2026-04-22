@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils.compute import I_identity, F
+from langevin_sim.utils.compute import I_identity, F, const_initial_conditions
 from langevin_sim.utils.other import load_config
 from langevin_sim.io.results import ResultsManager
 
@@ -25,8 +25,16 @@ config = load_config(config_path=config_path)
 
 rm = ResultsManager(config_path=config_path, tag="free")
 
+# Initial conditions
+r_const = np.array([0,0,0],dtype=float)
+n_const = np.array([1,0,0],dtype=float)
+r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
+
+
+
 
 # Run simulation 
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, results_manager=rm)
+sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, results_manager=rm)
+# sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, results_manager=rm)
 r, n = sim.run()
 sim.plot_trajectories()

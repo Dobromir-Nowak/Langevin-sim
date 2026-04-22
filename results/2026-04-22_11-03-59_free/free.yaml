@@ -1,5 +1,5 @@
 # Constants
-D_r: 0.067 # rotation diffusion coefficient
+D_r: 0.0067 # rotation diffusion coefficient
 D: 0. # translational diffusion coefficient
 
 # Parameters
