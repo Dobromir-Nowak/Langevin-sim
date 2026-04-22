@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils.compute import make_I_Gaussian_beam
+from langevin_sim.utils.compute import make_I_Gaussian_beam, F
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_density_rho, plot_hist_z, plot_hist_rho
 from langevin_sim.io.results import ResultsManager
@@ -25,11 +25,7 @@ sigma_beam = config["sigma_beam"]
 rm = ResultsManager(config_path=config_path, tag="cylinder3d_gaussian_beam")
 
 
-# Approximation of exact integrals
-def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3
-    return (np.pi-2)*I/2 - I**2 * sin_psi / 3 + (3*np.pi - 4)/24 * I**3 * sin_psi**2
-
-f_fn = f_new
+f_fn = F
 I_fn = make_I_Gaussian_beam(config)
 
 
@@ -37,7 +33,7 @@ I_fn = make_I_Gaussian_beam(config)
 r_init, n_init = random_initial_conditions_Cylinder3D(config)
 geometry = Cylinder3D(config=config)
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-results = sim.run(save_every=100000)
+results = sim.run(save_every=10000)
 
 # Final results
 r, n = results["r"], results["n"]
