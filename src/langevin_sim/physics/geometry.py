@@ -7,84 +7,65 @@ def reflect_orientation(n:np.ndarray, n_normal:np.ndarray):
     n_copy = n_copy - 2*n_normal * np.sum(n*n_normal,axis=0)
     return n_copy
 
-def random_initial_conditions_Cylinder3D(config: dict):
-    
-    dim = config["dim"]
-    N = config["N"]
-    zmin = config["zmin"]
-    zmax = config["zmax"]
-    R = config["R_cylinder"]
+def enforce_bounceback(r, bb_dim, domain_dims,n): # r.shape = (dim, N_samples)
+    x_bb = r[bb_dim,:]
+    Lx = domain_dims[bb_dim]
+    if np.any(x_bb>2*Lx):
+        raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
+    # reflect_orientation
+    if_bb = np.logical_or(x_bb<0,x_bb>Lx)
+    n[bb_dim,if_bb]*=-1
 
-    phi_rand = 2*np.pi*np.random.rand(N)
-    radius_rand = R*np.sqrt(np.random.rand(N)) # important (change of variables)
-    z_rand = zmin + (zmax-zmin)*np.random.rand(N)
-
-    # Initial positions within the cylinder
-    x = radius_rand*np.cos(phi_rand)
-    y = radius_rand*np.sin(phi_rand)
-    z = z_rand
-    r_init = np.concatenate((x,y,z))
-    r_init = r_init.reshape((dim,N))
-
-    # Initial orientations within the cylinder
-    n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
-    n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
-    return r_init, n_init
+    # reflect position, identity for x_bb in [0,Lx]
+    x_bb = Lx - np.abs(x_bb - Lx)
+    r[bb_dim,:] = x_bb
 
 
 class Cuboid:
     def __init__(self, config:dict):
+        self.config = config
         self.Lx = config["Lx"]
         self.Ly = config["Ly"]
         self.Lz = config["Lz"]
+        self.L = np.array([self.Lx, self.Ly, self.Lz])
 
-        return
-        #TODO implement the whole class and its methods
+    def apply(self, r_old, r_new, n):
+        """
+        r_old, r_new, n: shape (3, N)
+        modifies r_new and n
+        r_old is not needed here, but is kept for synctactic consistency
+        returns None
+        """
+        for bb_dim in range(3):
+            enforce_bounceback(r_new, bb_dim, self.L,n)
 
-        def apply(self, r_old, r_new, n):
-            """
-            r_old, r_new, n: shape (3, N)
-            modifies r_new and n
-            returns None
-            """
-        #TODO implement this method to apply the boundary conditions of the cuboid
+
+    def random_initial_conditions(self):
+        
+        dim = self.config["dim"]
+        N = self.config["N"]
+
+        # Initial positions
+        rand = np.random.rand(dim,N)
+        r_init = self.L[:,None]*rand
+
+        # Initial orientations
+        n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
+        n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+        return r_init, n_init
+
+
 
 class Cylinder3D:
     def __init__(
             self,
             config: dict,
             bc="reflective"):
+        self.config = config
         self.R = config["R_cylinder"]
         self.zmin = config["zmin"]
         self.zmax = config["zmax"]
         self.bc = bc
-    
-    # # phi - signed distance function
-    # # positive outside, negative inside domain 
-    # def grad_phi(self, r): # r.shape=(dim, N)
-    #     x, y, z = r[0,:], r[1,:], r[2,:]
-    #     rho = np.sqrt(x**2 + y**2)
-    #     phi_radial = rho - self.R
-    #     phi_top = z - self.zmax
-    #     phi_bottom = -z + self.zmin
-
-    #     phi_stack = np.stack([phi_radial, phi_top, phi_bottom], axis=0)
-    #     idx = np.argmax(phi_stack, axis=0)
-    #     # phi = phi_stack[idx] # phi.shape = (N,)
-
-    #     grad = np.zeros_like(r)
-        
-    #     mask_radial = idx == 0
-    #     grad[0, mask_radial] = x[mask_radial]/rho[mask_radial]
-    #     grad[1, mask_radial] = y[mask_radial]/rho[mask_radial]
-
-    #     mask_top = idx == 1
-    #     grad[2, mask_top] = 1.
-
-    #     mask_bottom = idx == 2
-    #     grad[2, mask_bottom] = -1.
-
-    #     return grad
     
     def phi_only(self, r): # r.shape=(dim, N)
         x, y, z = r[0,:], r[1,:], r[2,:]
@@ -129,7 +110,6 @@ class Cylinder3D:
                 continue
 
             active = np.where(if_outside)[0][hit_mask]
-            dr = end[:, hit_mask] - start[:, hit_mask]
             remaining = end[:, hit_mask] - hit
             reflected = remaining - 2 * np.sum(remaining * normal, axis=0, keepdims=True) * normal
 
@@ -220,26 +200,26 @@ class Cylinder3D:
 
         r[2] = np.clip(r[2], self.zmin, self.zmax)
 
-# def make_geometry_mask(name: str, **params) -> Callable[[np.ndarray], np.ndarray]:
+    def random_initial_conditions(self):
+        
+        dim = self.config["dim"]
+        N = self.config["N"]
+        zmin = self.config["zmin"]
+        zmax = self.config["zmax"]
+        R = self.config["R_cylinder"]
 
-#     if name == "cylinder":
-#         R = params["R"]
-#         zmin = params.get("z_min", 0.0)
-#         zmax = params.get("z_max", 1.0)
+        phi_rand = 2*np.pi*np.random.rand(N)
+        radius_rand = R*np.sqrt(np.random.rand(N)) # important (change of variables)
+        z_rand = zmin + (zmax-zmin)*np.random.rand(N)
 
-#         def mask(r):
-#             x, y, z = r
-#             return (x**2 + y**2 < R**2) & (z >= zmin) & (z <= zmax)
+        # Initial positions within the cylinder
+        x = radius_rand*np.cos(phi_rand)
+        y = radius_rand*np.sin(phi_rand)
+        z = z_rand
+        r_init = np.concatenate((x,y,z))
+        r_init = r_init.reshape((dim,N))
 
-#         return mask
-
-#     elif name == "sphere":
-#         R = params["R"]
-
-#         def mask(r):
-#             return np.sum(r**2, axis=0) < R**2
-
-#         return mask
-
-#     else:
-#         raise ValueError(f"Unknown geometry: {name}")
+        # Initial orientations within the cylinder
+        n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
+        n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+        return r_init, n_init

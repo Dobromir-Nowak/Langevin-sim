@@ -22,18 +22,18 @@ config = load_config(config_path=config_path)
 f_fn = F
 I_fn = make_linear_grad_beam(config=config)
 
-rm = ResultsManager(config_path=config_path, tag="cuboid_lin")
-
-# Initial conditions
-r_const = np.array([0,0,0],dtype=float)
-n_const = np.array([0,0,1],dtype=float)
-r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
+# rm = ResultsManager(config_path=config_path, tag="cuboid_lin")
 
 # Geometry
 geometry = Cuboid(config=config)
 
+# Initial conditions
+r_init, n_init = geometry.random_initial_conditions()
+# r_const = np.array([5,5,5],dtype=float)
+# n_const = np.array([1/np.sqrt(3),1/np.sqrt(3),1/np.sqrt(3)],dtype=float)
+# r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
+
 # Run simulation 
-sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-# sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, results_manager=rm)
+sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
 r, n = sim.run()
 sim.plot_trajectories()

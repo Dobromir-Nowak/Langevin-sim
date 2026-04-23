@@ -8,7 +8,7 @@ from langevin_sim.plotting.plots import plot_density_rho, plot_hist_z, plot_hist
 from langevin_sim.io.results import ResultsManager
 
 from langevin_sim.physics.langevin import Langevin_sim
-from langevin_sim.physics.geometry import Cylinder3D, random_initial_conditions_Cylinder3D
+from langevin_sim.physics.geometry import Cylinder3D
 
 
 # Load plot style
@@ -28,8 +28,8 @@ I_fn = make_I_Gaussian_beam(config)
 
 
 # Run simulation
-r_init, n_init = random_initial_conditions_Cylinder3D(config)
 geometry = Cylinder3D(config=config)
+r_init, n_init = geometry.random_initial_conditions()
 sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
 results = sim.run(save_every=10000)
 
