@@ -27,7 +27,7 @@ rm = ResultsManager(config_path=config_path, tag="free")
 
 # Initial conditions
 r_const = np.array([0,0,0],dtype=float)
-n_const = np.array([1,0,0],dtype=float)
+n_const = np.array([0,0,1],dtype=float)
 r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 

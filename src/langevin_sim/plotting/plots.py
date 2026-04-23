@@ -38,6 +38,18 @@ def plot_density_rho(
         plt.show()
     return fig
 
+def plot_hist_x(
+    x: np.ndarray,
+    bins: int = 40,
+    show: bool = True
+    ):
+    fig, ax = plt.subplots()
+    ax.hist(x, bins=bins)
+    ax.set_xlabel(fr"$x$")
+    ax.set_ylabel("counts")
+    if show:
+        plt.show()
+    return fig
 
 def plot_hist_z(
     z: np.ndarray,

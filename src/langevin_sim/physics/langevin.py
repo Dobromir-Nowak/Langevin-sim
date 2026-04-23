@@ -3,7 +3,7 @@ import numpy as np
 from typing import Callable, Optional
 from tqdm import tqdm
 from langevin_sim.plotting.plots import plot_trajectories as plot_trajectories_from_history
-from langevin_sim.physics.geometry import Cylinder3D
+from langevin_sim.physics.geometry import Cylinder3D, Cuboid
 from langevin_sim.io.results import ResultsManager
 
 
@@ -17,7 +17,7 @@ class Langevin_sim:
         f_fn: Callable[[np.ndarray, np.ndarray],np.ndarray],
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
-        geometry: Cylinder3D | None = None,
+        geometry: Cylinder3D | Cuboid | None = None,
         results_manager: ResultsManager | None = None
     )->None:
 
@@ -100,27 +100,35 @@ class Langevin_sim:
     def step(self):
         """One time step update."""
         r_old = self.r.copy()
-        if self.w0 != 0.:
-            vec_I = self.vec_I[:, None]
-            dot_prod = np.sum(self.n*(-vec_I), axis=0, keepdims=True)
-            sin_psi = dot_prod # r,n -- (self.dim, self.N), sin_psi -- (1, self.N)
-            omega_values = self.w0*self.Omega(sin_psi)
-            dn_rot = omega_values*self.dt*(-vec_I -dot_prod*self.n)
-            self.n += dn_rot
+        n_old = self.n.copy()
 
-        if self.D_r != 0.:
-            dn_noise = np.sqrt(2.*self.D_r*self.dt) * np.random.randn(self.dim, self.N)
-            dn_noise -= self.n*np.sum(self.n*dn_noise, axis=0, keepdims=True) 
-            self.n += dn_noise
-
-        self._normalize_orientations()
-
-        self.r += self.v0*self.dt*self.n # deterministic step
+        # Position update
+        self.r += self.v0*self.dt*n_old # deterministic step
         if self.D != 0.:
             self.r += np.sqrt(2.*self.D*self.dt) * np.random.randn(self.dim, self.N)
 
         if self.geometry is not None:
-            self.geometry.apply(r_old, self.r, self.n)
+            self.geometry.apply(r_old, self.r, self.n) # modifies self.r and self.n in-place if needed
+
+        n_old = self.n.copy() # orientations after possible geometry reflection, before orientation update
+
+        # Orientation update
+        if self.w0 != 0.:
+            vec_I = self.vec_I[:, None]
+            dot_prod = np.sum(n_old*(-vec_I), axis=0, keepdims=True)
+            sin_psi = np.sqrt(np.maximum(0.0, 1.0 - dot_prod**2))  # r,n -- (self.dim, self.N), sin_psi -- (1, self.N)
+            omega_values = self.w0*self.Omega(sin_psi)
+            dn_rot = omega_values*self.dt*(-vec_I -dot_prod*n_old)
+            self.n += dn_rot
+
+        if self.D_r != 0.:
+            dn_noise = np.sqrt(2.*self.D_r*self.dt) * np.random.randn(self.dim, self.N)
+            dn_noise -= self.n*np.sum(n_old*dn_noise, axis=0, keepdims=True) 
+            self.n += dn_noise
+
+        self._normalize_orientations()
+
+
     # ------------------------
     # Simulation loop
     # ------------------------

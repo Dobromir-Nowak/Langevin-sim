@@ -34,9 +34,20 @@ def random_initial_conditions_Cylinder3D(config: dict):
 
 class Cuboid:
     def __init__(self, config:dict):
+        self.Lx = config["Lx"]
+        self.Ly = config["Ly"]
+        self.Lz = config["Lz"]
+
         return
         #TODO implement the whole class and its methods
 
+        def apply(self, r_old, r_new, n):
+            """
+            r_old, r_new, n: shape (3, N)
+            modifies r_new and n
+            returns None
+            """
+        #TODO implement this method to apply the boundary conditions of the cuboid
 
 class Cylinder3D:
     def __init__(
@@ -48,32 +59,32 @@ class Cylinder3D:
         self.zmax = config["zmax"]
         self.bc = bc
     
-    # phi - signed distance function
-    # positive outside, negative inside domain 
-    def grad_phi(self, r): # r.shape=(dim, N)
-        x, y, z = r[0,:], r[1,:], r[2,:]
-        rho = np.sqrt(x**2 + y**2)
-        phi_radial = rho - self.R
-        phi_top = z - self.zmax
-        phi_bottom = -z + self.zmin
+    # # phi - signed distance function
+    # # positive outside, negative inside domain 
+    # def grad_phi(self, r): # r.shape=(dim, N)
+    #     x, y, z = r[0,:], r[1,:], r[2,:]
+    #     rho = np.sqrt(x**2 + y**2)
+    #     phi_radial = rho - self.R
+    #     phi_top = z - self.zmax
+    #     phi_bottom = -z + self.zmin
 
-        phi_stack = np.stack([phi_radial, phi_top, phi_bottom], axis=0)
-        idx = np.argmax(phi_stack, axis=0)
-        # phi = phi_stack[idx] # phi.shape = (N,)
+    #     phi_stack = np.stack([phi_radial, phi_top, phi_bottom], axis=0)
+    #     idx = np.argmax(phi_stack, axis=0)
+    #     # phi = phi_stack[idx] # phi.shape = (N,)
 
-        grad = np.zeros_like(r)
+    #     grad = np.zeros_like(r)
         
-        mask_radial = idx == 0
-        grad[0, mask_radial] = x[mask_radial]/rho[mask_radial]
-        grad[1, mask_radial] = y[mask_radial]/rho[mask_radial]
+    #     mask_radial = idx == 0
+    #     grad[0, mask_radial] = x[mask_radial]/rho[mask_radial]
+    #     grad[1, mask_radial] = y[mask_radial]/rho[mask_radial]
 
-        mask_top = idx == 1
-        grad[2, mask_top] = 1.
+    #     mask_top = idx == 1
+    #     grad[2, mask_top] = 1.
 
-        mask_bottom = idx == 2
-        grad[2, mask_bottom] = -1.
+    #     mask_bottom = idx == 2
+    #     grad[2, mask_bottom] = -1.
 
-        return grad
+    #     return grad
     
     def phi_only(self, r): # r.shape=(dim, N)
         x, y, z = r[0,:], r[1,:], r[2,:]
