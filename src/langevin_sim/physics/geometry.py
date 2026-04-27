@@ -10,16 +10,20 @@ def reflect_orientation(n:np.ndarray, n_normal:np.ndarray):
 def enforce_bounceback(r, bb_dim, domain_dims,n): # r.shape = (dim, N_samples)
     x_bb = r[bb_dim,:]
     Lx = domain_dims[bb_dim]
-    if np.any(x_bb>2*Lx):
-        raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
-    # reflect_orientation
-    if_bb = np.logical_or(x_bb<0,x_bb>Lx)
+
+    # reflect orientation
+    if_bb = np.logical_or(x_bb<=0,x_bb>=Lx)
     n[bb_dim,if_bb]*=-1
 
-    # reflect position, identity for x_bb in [0,Lx]
-    x_bb = Lx - np.abs(x_bb - Lx)
-    r[bb_dim,:] = x_bb
+    # reflect position
+    x_bb = np.abs(x_bb) # reflection about 0
+    x_bb = Lx - np.abs(x_bb - Lx) # reflection about Lx; identity for x_bb in [0,Lx]; formula works for x in [0,2*Lx]
+    r[bb_dim,:] = x_bb 
 
+    if np.any(x_bb>Lx) or np.any(x_bb<0):
+        print(x_bb[x_bb<0])
+        print(x_bb[x_bb>Lx])
+        raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
 
 class Cuboid:
     def __init__(self, config:dict):
@@ -46,7 +50,8 @@ class Cuboid:
         N = self.config["N"]
 
         # Initial positions
-        rand = np.random.rand(dim,N)
+        rand = np.random.rand(dim,N) # np.random.rand(dim,N)*(1-2e-12)+1e-12
+
         r_init = self.L[:,None]*rand
 
         # Initial orientations

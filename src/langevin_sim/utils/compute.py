@@ -39,6 +39,13 @@ def make_linear_grad_beam(config: dict):
 def I_identity(r): # r - positions to check field at:
     return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
 
+def make_const_beam(config: dict):
+    def I_const(r):
+        I = config["I"] # const light intensity
+        if config["I"] is None:
+            raise ValueError
+        return I*I_identity(r)
+    return I_const
 
 def const_initial_conditions(config: dict, r_const: np.ndarray, n_const: np.ndarray):
     N=config["N"]
