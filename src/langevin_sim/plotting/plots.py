@@ -43,14 +43,32 @@ def plot_hist(
     axis_label: str,
     bins: int = 40,
     label: str | None = None,
+    bin_stats: bool = False,
+    show_count_fluct: bool = False,
     show: bool = True
     ):
     fig, ax = plt.subplots()
-    ax.hist(x, bins=bins)
+
+    counts, bin_edges, _ = ax.hist(x, bins=bins)
+
     ax.set_xlabel(fr"${axis_label}$")
     ax.set_ylabel("counts")
     if label is not None:
         ax.set_title(label)
+    if bin_stats:
+        mean = np.mean(counts)
+        s = np.sqrt(mean) # uncertainty due to binning for a uniform distribution
+        ax.text(
+            0.95, 0.95,
+            fr"$\mu={mean:.0f},\ \sigma={s:.0f}$",
+            transform=ax.transAxes,
+            ha="right", va="top"
+        )
+    if show_count_fluct:
+        ax.axhline(float(mean), linestyle="--", color="r", linewidth=1., label =r"$\mu$")
+        ax.axhline(float(mean + s), linestyle=":", color="r",linewidth=1., label=r"$\mu\pm\sigma$")
+        ax.axhline(float(mean - s), linestyle=":", color="r",linewidth=1.)
+        ax.legend(frameon=False)
     if show:
         plt.show()
     return fig

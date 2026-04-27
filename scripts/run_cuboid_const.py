@@ -36,7 +36,7 @@ r_init, n_init = geometry.random_initial_conditions()
 
 # Run simulation 
 sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
-results = sim.run(save_every=10000)
+results = sim.run(save_every=1000)
 # sim.plot_trajectories()
 
 r, n = results["r"], results["n"]
@@ -47,5 +47,5 @@ n_z = n[-1,2,:]
 n_z_some = n_z[z>frac*config["Lz"]]
 
 # Plotting
-rm.save_plot(plot_hist(n_z, axis_label=fr"$\cos\theta$", bins=40, label=fr"Angular distribution of all swimmers, $I={config["I"]}$"), name="hist_n_z")
-rm.save_plot(plot_hist(n_z_some, axis_label=fr"$\cos\theta$", bins=40, label=fr"Angular distribution of swimmers with $z>{frac} \cdot L_z$, $I={config["I"]}$"), name=f"hist_n_z_{frac}")
+rm.save_plot(plot_hist(n_z, axis_label=fr"$\cos\theta$", bins=40, label=fr"Angular distribution of all swimmers, $I={config["I"]}$", bin_stats = True, show_count_fluct=True), name="hist_n_z")
+# rm.save_plot(plot_hist(n_z_some, axis_label=fr"$\cos\theta$", bins=40, label=fr"Angular distribution of swimmers with $z>{frac} \cdot L_z$, $I={config["I"]}$"), name=f"hist_n_z_{frac}")
