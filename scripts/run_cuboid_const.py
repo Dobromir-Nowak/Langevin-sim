@@ -10,8 +10,6 @@ from langevin_sim.io.results import ResultsManager
 from langevin_sim.physics.langevin import Langevin_sim
 from langevin_sim.physics.geometry import Cuboid
 
-
-
 # Load plot style
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")

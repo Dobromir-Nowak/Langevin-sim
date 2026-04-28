@@ -2,6 +2,55 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
+
+
+class PlotCollector:
+    def __init__(self):
+        self.jobs = []
+
+    def add(self, plot_fn, *args, label=None, **kwargs):
+        self.jobs.append({
+            "fn": plot_fn,
+            "args": args,
+            "kwargs": kwargs,
+            "label": label
+        })
+
+    def render(self, layout="grid", ncols=2, sharex=False, sharey=False, show=True):
+        n = len(self.jobs)
+
+        if layout == "grid":
+            nrows = math.ceil(n / ncols)
+        elif layout == "column":
+            ncols, nrows = 1, n
+        elif layout == "row":
+            ncols, nrows = n, 1
+        else:
+            raise ValueError("unknown layout")
+
+        fig, axes = plt.subplots(nrows, ncols,
+                                 figsize=(5*ncols, 4*nrows),
+                                 squeeze=False,
+                                 sharex=sharex, sharey=sharey)
+
+        axes = axes.flatten()
+
+        for i, job in enumerate(self.jobs):
+            ax = axes[i]
+            job["fn"](ax, *job["args"], **job["kwargs"])
+
+            if job["label"] is not None:
+                ax.set_title(job["label"])
+
+        # remove unused axes
+        for j in range(i+1, len(axes)):
+            fig.delaxes(axes[j])
+        if show:
+            plt.show()
+
+        return fig
+    
 
 def plot_hist_rho(
     rho: np.ndarray,
@@ -37,6 +86,38 @@ def plot_density_rho(
     if show:
         plt.show()
     return fig
+
+def plot_hist_ax(
+    ax, 
+    x: np.ndarray,
+    axis_label: str,
+    bins: int = 40,
+    label: str | None = None,
+    bin_stats: bool = False,
+    show_count_fluct: bool = False
+    ):
+
+    counts, bin_edges, _ = ax.hist(x, bins=bins)
+
+    ax.set_xlabel(fr"${axis_label}$")
+    ax.set_ylabel("counts")
+    if label is not None:
+        ax.set_title(label)
+    if bin_stats:
+        mean = np.mean(counts)
+        s = np.sqrt(mean) # uncertainty due to binning for a uniform distribution
+        ax.text(
+            0.95, 0.95,
+            fr"$\mu={mean:.0f},\ \sigma={s:.0f}$",
+            transform=ax.transAxes,
+            ha="right", va="top"
+        )
+    if show_count_fluct:
+        ax.axhline(float(mean), linestyle="--", color="r", linewidth=1., label =r"$\mu$")
+        ax.axhline(float(mean + s), linestyle=":", color="r",linewidth=1., label=r"$\mu\pm\sigma$")
+        ax.axhline(float(mean - s), linestyle=":", color="r",linewidth=1.)
+        ax.legend(frameon=False)
+
 
 def plot_hist(
     x: np.ndarray,
