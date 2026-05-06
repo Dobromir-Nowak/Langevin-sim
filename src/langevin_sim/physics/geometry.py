@@ -25,6 +25,77 @@ def enforce_bounceback(r, bb_dim, domain_dims,n): # r.shape = (dim, N_samples)
         print(x_bb[x_bb>Lx])
         raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
 
+def enforce_custom_bb(r_old, r_new, bb_dim, domain_dims,n,alpha): # r.shape = (dim, N_samples)
+    x_bb = r_new[bb_dim,:]
+    Lx = domain_dims[bb_dim]
+
+    # reflect orientation
+    if_bb_upper = x_bb>=Lx
+    if_bb_lower = x_bb<=0
+    if_any_bb = np.logical_or(if_bb_upper, if_bb_lower)
+    n_proj = np.copy(n)
+    n_proj[bb_dim,if_any_bb] = 0. # projection onto the plane
+
+    norms = np.linalg.norm(n_proj, axis=0)      # normalizing the projected orientation
+    zero_mask = norms == 0.0
+    if np.any(zero_mask):
+        raise ValueError(
+            f"Zero-norm orientation vectors detected at indices "
+            f"{np.where(zero_mask)[0]}")
+    n_proj /= norms
+
+    n[:,if_any_bb] = np.cos(alpha)*n_proj[:,if_any_bb] # changing in-plane components
+    n[bb_dim, if_bb_upper] = -np.sin(alpha)
+    n[bb_dim,if_bb_lower] = np.sin(alpha)
+
+
+    # reflect position
+    x_bb[if_any_bb]=r_old[bb_dim,if_any_bb]
+    r_new[bb_dim,:] = x_bb 
+
+    if np.any(x_bb>Lx) or np.any(x_bb<0):
+        print(x_bb[x_bb<0])
+        print(x_bb[x_bb>Lx])
+        raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
+
+class NewCuboid:
+    def __init__(self, config:dict, alpha: float):
+        self.config = config
+        self.Lx = config["Lx"]
+        self.Ly = config["Ly"]
+        self.Lz = config["Lz"]
+        self.L = np.array([self.Lx, self.Ly, self.Lz])
+        self.alpha = alpha
+
+    def apply(self, r_old, r_new, n):
+        """
+        r_old, r_new, n: shape (3, N)
+        modifies r_new and n
+        returns None
+        """
+        for bb_dim in range(2):
+            enforce_bounceback(r_new,bb_dim,self.L,n)
+        bb_dim = 2
+        enforce_custom_bb(r_old, r_new, bb_dim, self.L, n, self.alpha)
+
+
+    def random_initial_conditions(self):
+        
+        dim = self.config["dim"]
+        N = self.config["N"]
+
+        # Initial positions
+        rand = np.random.rand(dim,N) # np.random.rand(dim,N)*(1-2e-12)+1e-12
+
+        r_init = self.L[:,None]*rand
+
+        # Initial orientations
+        n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
+        n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+        return r_init, n_init
+
+
+
 class Cuboid:
     def __init__(self, config:dict):
         self.config = config
