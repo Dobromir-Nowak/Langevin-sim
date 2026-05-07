@@ -15,6 +15,7 @@ class Langevin_sim:
         config: dict,
         I_fn: Callable[[np.ndarray],np.ndarray],
         f_fn: Callable[[np.ndarray, np.ndarray],np.ndarray],
+        D_fn: Callable[[np.ndarray],np.ndarray] | None = None,
         r0: np.ndarray | None = None,
         n0: np.ndarray | None = None,
         geometry: Cylinder3D | Cuboid | None = None,
@@ -41,6 +42,7 @@ class Langevin_sim:
         # callable functions (light intensity and angular velocity)
         self.f_fn = f_fn
         self.I_fn = I_fn
+        self.D_fn = D_fn
 
         # Intial conditions
         # default
@@ -122,7 +124,12 @@ class Langevin_sim:
             self.n += dn_rot
 
         if self.D_r != 0.:
-            dn_noise = np.sqrt(2.*self.D_r*self.dt) * np.random.randn(self.dim, self.N)
+            if self.D_fn is not None:
+                I_vals = self.I_fn(r_old)
+                D_r = self.D_r*self.D_fn(I_vals) # shape (1, N)
+            else:
+                D_r = self.D_r
+            dn_noise = np.sqrt(2.*D_r*self.dt) * np.random.randn(self.dim, self.N)
             dn_noise -= self.n*np.sum(n_old*dn_noise, axis=0, keepdims=True) 
             self.n += dn_noise
 
