@@ -35,26 +35,84 @@ r_init, n_init = geometry.random_initial_conditions()
 # r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 # Run simulation 
-save_every = 10
+save_every = 1000
 sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
 results = sim.run(save_every=save_every)
 # sim.plot_trajectories()
 
 r, n = results["r"], results["n"]
 x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
-n_z = n[-1,2,:]
-n_z_some = n_z[z>0.999*config["Lz"]]
+nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
+
+# 2D currents xz
+
+bins_x = bins_z = 10
+
+Lx = config["Lx"]
+Lz = config["Lz"]
+dx = Lx/bins_x
+dz = Lz/bins_z
+
+ix = (x/dx).astype(int) # indices of x bins
+iz = (z/dz).astype(int)
+
+Jx = np.zeros((bins_x,bins_z))
+Jz = np.zeros((bins_x, bins_z))
+np.add.at(Jx, (ix, iz), nx)
+np.add.at(Jz, (ix, iz), nz)
+Jx /= dx
+Jz /= dz
+
+x_centers = (np.arange(bins_x) + 1/2)*dx
+y_centers = (np.arange(bins_z) + 1/2)*dz
+X, Z = np.meshgrid(x_centers, y_centers, indexing='ij')
+
+plt.quiver(X, Z, Jx, Jz)
+plt.show()
+
+
+# # 2D currents xy
+
+# bins_x = bins_y = 10
+
+# Lx = config["Lx"]
+# Ly = config["Ly"]
+# dx = Lx/bins_x
+# dy = Ly/bins_y
+
+# ix = (x/dx).astype(int) # indices of x bins
+# iy = (y/dy).astype(int)
+
+# Jx = np.zeros((bins_x,bins_y))
+# Jy = np.zeros((bins_x, bins_y))
+# np.add.at(Jx, (ix, iy), nx)
+# np.add.at(Jy, (ix, iy), ny)
+# Jx /= dx
+# Jy /= dy
+
+# x_centers = (np.arange(bins_x) + 1/2)*dx
+# y_centers = (np.arange(bins_y) + 1/2)*dy
+# X, Y = np.meshgrid(x_centers, y_centers, indexing='ij')
+
+# plt.quiver(X, Y, Jx, Jy)
+# plt.show()
 
 
 
-# for i in range(config["Nt"]//save_every):
-#     x = r[i,0,:]
-#     plot_hist(x, axis_label="x", bins=20)
 
+# # 1D currents
 
-# Plotting
-# rm.save_plot(plot_hist(x, axis_label="x", bins=20), name="hist_x")
-# rm.save_plot(plot_hist(y, axis_label="y", bins=20), name="hist_y")
-# rm.save_plot(plot_hist(z, axis_label="z", bins=20), name="hist_z")
-# rm.save_plot(plot_hist(n_z, axis_label=fr"$\cos\theta$", bins=40, label="Angular distribution of all swimmers"), name="hist_n_z")
-# rm.save_plot(plot_hist(n_z_some, axis_label=fr"$\cos\theta$", bins=40, label=fr"Angular distribution of swimmers with $z>0.999 \cdot L_z$"), name="hist_n_z_some")
+# bins_x = bins_y = 20
+
+# Lx = config["Lx"]
+# dx = Lx/bins_x
+
+# ix = (x/dx).astype(int) # indices of x bins
+
+# Jx = np.zeros(bins_x)
+# np.add.at(Jx, (ix,), nx)
+# Jx /= dx
+
+# x_centers = (np.arange(bins_x)+1/2)*dx
+# plt.plot(x_centers, Jx)
+# plt.show()

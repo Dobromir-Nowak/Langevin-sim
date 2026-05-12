@@ -10,13 +10,13 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.1 # time step
-Nt: 20000 # number of time steps
-N: 16000 # number of samples/ABPs
+Nt: 1000 # number of time steps
+N: 32000 # number of samples/ABPs
 
 # Beam parameters
 axis: 0 # gradient axis (0, 1, or 2)
 offset: 0.1 # value of the beam at the center
-grad: 0.5 # gradient of the beam
+grad: 0.005 # gradient of the beam
 
 # Cuboid parameters
 Lx: 100. # length of the cuboid in x-direction

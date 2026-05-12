@@ -14,7 +14,7 @@ Nt: 2000 # number of time steps
 N: 16000 # number of samples/ABPs
 
 # Beam parameters
-I: 15. # light intensity
+I: 10. # light intensity
 
 # Cuboid parameters
 Lx: 100. # length of the cuboid in x-direction

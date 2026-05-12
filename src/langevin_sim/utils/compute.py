@@ -104,10 +104,10 @@ def f_new(I: np.ndarray, sin_psi:np.ndarray):  # up to order 3
 # new approximations:
 def F1(I: np.ndarray, sin_psi:np.ndarray):  # phenomenological approximation of I*f1(x)x^{-1} valid for I*sin_psi in [0,10] interval
     x = I*sin_psi
-    return I* (1+0.046*x)/(1+0.34*x)
+    return I*(1+0.046*x)/(1+0.34*x)
 def F2(I: np.ndarray, sin_psi:np.ndarray):  # phenomenological approximation of I*f2(x)x^{-1} valid for I*sin_psi in [0,10] interval
     x = I*sin_psi
-    return I* (1+0.043*x)/(2/np.pi+0.267*x)
+    return I*(1+0.043*x)/(2/np.pi+0.267*x)
 
 def F(I: np.ndarray, sin_psi: np.ndarray):
     return F2(I, sin_psi) - F1(I, sin_psi)
