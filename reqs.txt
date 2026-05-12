@@ -1,6 +1,0 @@
-numpy
-matplotlib
-pathlib
-yaml
-tqdm
-typing
