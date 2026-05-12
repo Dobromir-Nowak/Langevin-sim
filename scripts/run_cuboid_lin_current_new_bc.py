@@ -47,7 +47,7 @@ nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 
 # 2D currents xz
 
-bins_x = bins_z = 10
+bins_x = bins_z = 20
 
 Lx = config["Lx"]
 Lz = config["Lz"]
@@ -71,6 +71,18 @@ X, Z = np.meshgrid(x_centers, y_centers, indexing='ij')
 plt.quiver(X, Z, Jx, Jz)
 plt.show()
 
+# Density (rho) xz
+rho = np.zeros((bins_x,bins_z))
+np.add.at(rho, (ix, iz), 1/(dx*dz))   # TODO check normalization when it becomes relevant
+
+plt.imshow(
+    rho.T,
+    origin='lower',
+    extent=[0, Lx, 0, Lz],
+    aspect='auto'
+)
+plt.colorbar(label='density')
+plt.show()
 
 # # 2D currents xy
 
