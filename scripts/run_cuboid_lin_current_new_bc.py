@@ -45,6 +45,21 @@ r, n = results["r"], results["n"]
 x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 
+
+# Hist
+
+
+
+r, n = results["r"], results["n"]
+x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
+z_some = z[z>0.99*config["Lz"]]
+
+# Plotting
+plot_hist(z, axis_label="z", bins=20)
+plot_hist(z_some, axis_label="z_some", bins=20)
+
+
+
 # 2D currents xz
 
 bins_x = bins_z = 20
@@ -83,6 +98,7 @@ plt.imshow(
 )
 plt.colorbar(label='density')
 plt.show()
+
 
 # # 2D currents xy
 

@@ -2,13 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils.compute import I_identity, F, const_initial_conditions, const_initial_conditions_split, make_linear_grad_beam
+from langevin_sim.utils.compute import I_identity, F, const_initial_conditions, const_initial_conditions_split, make_linear_grad_beam, make_I_Gaussian_beam
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_hist
 from langevin_sim.io.results import ResultsManager
 
 from langevin_sim.physics.langevin import Langevin_sim
-from langevin_sim.physics.geometry import Cuboid
+from langevin_sim.physics.geometry import NewCuboid
 
 
 
@@ -16,17 +16,26 @@ from langevin_sim.physics.geometry import Cuboid
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
-file_name = "cuboid_lin"
+file_name = "cuboid_lin_new_bc"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
+alpha = 0.28
 
 f_fn = F
 I_fn = make_linear_grad_beam(config=config)
 
+sigma_beam = 30
+x0 = 50
+def I_fn(r):
+    x, y = r[0,:], r[1,:]
+    return np.exp(-((x-x0)**2)/(2*sigma_beam**2))[None,:]
+
+
+
 rm = ResultsManager(config_path=config_path, tag="cuboid_lin")
 
 # Geometry
-geometry = Cuboid(config=config)
+geometry = NewCuboid(config=config, alpha=alpha)
 
 # Initial conditions
 r_init, n_init = geometry.random_initial_conditions()
@@ -46,7 +55,7 @@ nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 
 # 2D currents xz
 
-bins_x = bins_z = 10
+bins_x = bins_z = 20
 
 Lx = config["Lx"]
 Lz = config["Lz"]
