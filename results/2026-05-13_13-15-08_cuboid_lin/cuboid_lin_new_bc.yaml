@@ -1,0 +1,27 @@
+# Constants
+D_r: 0.067 # rotation diffusion coefficient
+D: 0. # translational diffusion coefficient
+
+# Parameters
+dim: 3 # dimension of the problem
+v0: 10. # ABP speed
+w0: 1. # scale of angular velocity
+vec_I: [0., 0., -1.] # light direction (unit vector)
+
+# Simulation parameters
+dt: 0.1 # time step
+Nt: 10000 # number of time steps
+N: 32000 # number of samples/ABPs
+
+# Beam parameters
+axis: 0 # gradient axis (0, 1, or 2)
+offset: 0.1 # value of the beam at the center
+grad: 0.005 # 0.01  # gradient of the beam
+
+
+# Cuboid parameters
+Lx: 100. # length of the cuboid in x-direction
+Ly: 100. # length of the cuboid in y-direction
+Lz: 100. # length of the cuboid in z-direction
+
+
