@@ -58,44 +58,6 @@ def enforce_custom_bb(r_old, r_new, bb_dim, domain_dims,n,alpha): # r.shape = (d
         print(x_bb[x_bb>Lx])
         raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
 
-class NewCuboid:
-    def __init__(self, config:dict, alpha: float):
-        self.config = config
-        self.Lx = config["Lx"]
-        self.Ly = config["Ly"]
-        self.Lz = config["Lz"]
-        self.L = np.array([self.Lx, self.Ly, self.Lz])
-        self.alpha = alpha
-
-    def apply(self, r_old, r_new, n):
-        """
-        r_old, r_new, n: shape (3, N)
-        modifies r_new and n
-        returns None
-        """
-        for bb_dim in range(2):
-            enforce_bounceback(r_new,bb_dim,self.L,n)
-        bb_dim = 2
-        enforce_custom_bb(r_old, r_new, bb_dim, self.L, n, self.alpha)
-
-
-    def random_initial_conditions(self):
-        
-        dim = self.config["dim"]
-        N = self.config["N"]
-
-        # Initial positions
-        rand = np.random.rand(dim,N) # np.random.rand(dim,N)*(1-2e-12)+1e-12
-
-        r_init = self.L[:,None]*rand
-
-        # Initial orientations
-        n_rand = np.random.normal(loc=0,scale=1, size = (dim, N))
-        n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
-        return r_init, n_init
-
-
-
 class Cuboid:
     def __init__(self, config:dict):
         self.config = config
@@ -103,17 +65,32 @@ class Cuboid:
         self.Ly = config["Ly"]
         self.Lz = config["Lz"]
         self.L = np.array([self.Lx, self.Ly, self.Lz])
+        self.bc_type = config.get("bc_type", None)
+        if self.bc_type is None:
+            raise ValueError("No bc_type declared in config.")
+        
+        if self.bc_type != "custom_bb" and self.bc_type != "bb":
+            raise ValueError(f"{config["bc_type"]} is an incorrect bc_type.")
+        
+        if self.bc_type == "custom_bb":
+            self.alpha = config.get("alpha", None)
+            if self.alpha is None: 
+                raise ValueError("No alpha provided in config.")
 
     def apply(self, r_old, r_new, n):
         """
         r_old, r_new, n: shape (3, N)
         modifies r_new and n
-        r_old is not needed here, but is kept for synctactic consistency
         returns None
         """
-        for bb_dim in range(3):
-            enforce_bounceback(r_new, bb_dim, self.L,n)
-
+        if self.bc_type == "custom_bb":
+            for bb_dim in range(2):
+                enforce_bounceback(r_new,bb_dim,self.L,n)
+            bb_dim = 2
+            enforce_custom_bb(r_old, r_new, bb_dim, self.L, n, self.alpha)
+        if self.bc_type == "bb":
+            for bb_dim in range(3):
+                enforce_bounceback(r_new, bb_dim, self.L,n)
 
     def random_initial_conditions(self):
         
