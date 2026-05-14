@@ -10,11 +10,11 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.1 # time step
-Nt: 100 # number of time steps
+Nt: 1000 # number of time steps
 N: 32000 # number of samples/ABPs
 
 # Saving
-save_every: 1
+save_every: 10
 
 # Boundary conditions
 bc_type: "custom_bb" # "custom_bc" # boundary condition type ("bb" for standard bounce-back or "custom_bb" for custom bounce-back)

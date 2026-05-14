@@ -137,3 +137,23 @@ def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis"):
 
     ax.set_xlim(0, Lx)
     ax.set_ylim(0, Lz)
+
+
+def plot_n_correlation(ax, n: np.ndarray, config: dict, absolute = False):
+    dt = config["dt"]
+    save_every = config["save_every"]
+    Dt = save_every * dt
+    nt = n.shape[0]
+    t_lin = Dt * np.arange(nt)
+
+    n_init = n[0, :, :][None, :, :]
+    dot_prod = np.sum(n * n_init, axis=1)
+    mean_dot_prod = np.mean(dot_prod, axis=1)
+    if absolute:
+        ax.plot(t_lin, np.abs(mean_dot_prod))
+        ax.set_xlabel(r"$t$")
+        ax.set_ylabel(r"$|\langle \mathbf{n}(t)\cdot\mathbf{n}(0)\rangle|$")
+    else:
+        ax.plot(t_lin, mean_dot_prod)
+        ax.set_xlabel(r"$t$")
+        ax.set_ylabel(r"$\langle \mathbf{n}(t)\cdot\mathbf{n}(0)\rangle$")
