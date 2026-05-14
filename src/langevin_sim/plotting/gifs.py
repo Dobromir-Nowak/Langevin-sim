@@ -18,7 +18,7 @@ def make_gif(*data, plot_func, fps=20, title_func=None, show=True, **plot_kwargs
     def update(frame):
 
         ax.clear()
-
+        
         frame_data = [ar[frame] for ar in data]
         plot_func(ax, *frame_data, **plot_kwargs)
 
@@ -35,4 +35,5 @@ def make_gif(*data, plot_func, fps=20, title_func=None, show=True, **plot_kwargs
     )
     if show:
         plt.show()
+        print()
     return ani

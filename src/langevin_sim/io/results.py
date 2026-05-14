@@ -27,3 +27,5 @@ class ResultsManager:
 
     def save_gif(self, ani, name, save_fps):
         ani.save(self.plots / f"{name}.gif", writer="pillow", fps=save_fps)
+
+

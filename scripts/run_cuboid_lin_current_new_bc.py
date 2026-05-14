@@ -53,8 +53,8 @@ nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 
 x, y, z = r[:,0,:], r[:,1,:], r[:,2,:]
 nx, ny, nz = n[:,0,:], n[:,1,:], n[:,2,:]
-rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config), name="current", save_fps = 20)
-rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x"), name="hist", save_fps = 20)
+rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False), name="current", save_fps = 20)
+rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False), name="hist", save_fps = 20)
 
 # x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 # nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
