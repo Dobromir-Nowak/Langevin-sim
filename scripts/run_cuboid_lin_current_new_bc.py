@@ -42,7 +42,6 @@ r_init, n_init = geometry.random_initial_conditions()
 # r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 # Run simulation
-
 sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
 results = sim.run(save_every=config["save_every"])
 
