@@ -24,3 +24,6 @@ class ResultsManager:
 
     def save_npz(self, name, **arrays):
         np.savez(self.data / f"{name}.npz", **arrays)
+
+    def save_gif(self, ani, name, save_fps):
+        ani.save(self.plots / f"{name}.gif", writer="pillow", fps=save_fps)

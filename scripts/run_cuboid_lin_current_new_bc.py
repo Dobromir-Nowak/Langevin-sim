@@ -6,6 +6,7 @@ from langevin_sim.utils.compute import I_identity, F, const_initial_conditions, 
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_hist
 from langevin_sim.plotting.plots_ax import PlotCollector, plot_hist_ax, plot_current_ax, plot_density_ax
+from langevin_sim.plotting.gifs import make_gif
 from langevin_sim.io.results import ResultsManager
 
 from langevin_sim.physics.langevin import Langevin_sim
@@ -50,6 +51,14 @@ x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 
 
+x, y, z = r[:,0,:], r[:,1,:], r[:,2,:]
+nx, ny, nz = n[:,0,:], n[:,1,:], n[:,2,:]
+make_gif(x, plot_func=plot_hist_ax)
+rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax), name="current", save_fps = 20)
+rm.save_gif(make_gif(x, plot_func=plot_hist_ax), name="hist", save_fps = 20)
+
+x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
+nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 pc = PlotCollector()
 pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=20, bins_z=20)
 pc.add(plot_density_ax, x, z, config)
