@@ -5,7 +5,7 @@ from pathlib import Path
 from langevin_sim.utils.compute import I_identity, F, const_initial_conditions, const_initial_conditions_split, make_linear_grad_beam
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_hist
-from langevin_sim.plotting.plots_ax import PlotCollector, plot_hist_ax, plot_current_ax, plot_density_ax, plot_n_correlation
+from langevin_sim.plotting.plots_ax import PlotCollector, plot_hist_ax, plot_hist_lin_ax, plot_current_ax, plot_density_ax, plot_n_correlation
 from langevin_sim.plotting.gifs import make_gif
 from langevin_sim.io.results import ResultsManager
 
@@ -51,15 +51,22 @@ r, n = results["r"], results["n"]
 x, y, z = r[:,0,:], r[:,1,:], r[:,2,:]
 nx, ny, nz = n[:,0,:], n[:,1,:], n[:,2,:]
 
-# Orientation decorrelation
+
+# z histograms as a single plot
 pc = PlotCollector()
-pc.add(plot_n_correlation, n, config, absolute=True)
-pc.add(plot_n_correlation, n, config, absolute=False)
-rm.save_plot(pc.render(), name = "orientation_decorelation")
+pc.add(plot_hist_lin_ax, r, config, axis=2, t_label=True)
+pc.add(plot_hist_lin_ax, r, config, axis=0, t_label=False)
+rm.save_plot(pc.render(), name= f"test_fig")
+
+# # Orientation decorrelation
+# pc = PlotCollector()
+# pc.add(plot_n_correlation, n, config, absolute=True)
+# pc.add(plot_n_correlation, n, config, absolute=False)
+# rm.save_plot(pc.render(), name = "orientation_decorelation")
 
 # # Gifs
-# rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False), name="current", save_fps = 20)
-# rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False), name="hist", save_fps = 20)
+# rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False, fps=10), name="current", save_fps=10)
+# rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False, fps=10), name="hist", save_fps=10)
 
 # x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 # nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]

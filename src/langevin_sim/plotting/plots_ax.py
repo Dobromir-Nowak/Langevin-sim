@@ -157,3 +157,44 @@ def plot_n_correlation(ax, n: np.ndarray, config: dict, absolute = False):
         ax.plot(t_lin, mean_dot_prod)
         ax.set_xlabel(r"$t$")
         ax.set_ylabel(r"$\langle \mathbf{n}(t)\cdot\mathbf{n}(0)\rangle$")
+
+
+def plot_hist_lin_ax(ax, r, config, axis=None, bins=20, n_plots=5, t_label=True, log=False):
+
+    if axis not in (0,1,2):
+        raise ValueError
+    x = r[:,axis,:]
+
+    save_every = config["save_every"]
+    Nt = config["Nt"]
+    if n_plots > Nt//save_every:
+        raise ValueError("n_plots too large")
+    t_idx_list = np.arange(n_plots)
+    x = np.copy(x[t_idx_list,:])
+
+    t_list = config["dt"]*t_idx_list*save_every
+
+    axis_names = [r"$x$", r"$y$", r"$z$"]
+    side_names = ["Lx", "Ly", "Lz"]
+
+    L = config[side_names[axis]]
+    dx = L / bins
+    ix = (x / dx).astype(int)
+    x_bins = (np.arange(bins)+1/2)*dx
+
+    # binning
+    counts = np.zeros((n_plots,bins))
+    binning_indices = np.arange(n_plots)[:,None]*np.ones(ix.shape).astype(int)
+    np.add.at(counts, (binning_indices, ix), 1)
+
+    # making plots
+    for idx_t, t in enumerate(t_list):
+        if t_label:
+            ax.plot(x_bins, counts[idx_t,:], label=fr"$t={t:.0f}$")
+        else:
+            ax.plot(x_bins, counts[idx_t,:], label=fr"$t={t:.0f}$")
+        ax.set_xlabel(axis_names[axis])
+        ax.set_ylabel("counts")
+        if log: 
+            ax.set_yscale('log')
+        ax.legend()
