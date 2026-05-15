@@ -36,8 +36,13 @@ def make_linear_grad_beam(config: dict):
     return I_linear
 
 # Unit light intensity field
-def I_identity(r): # r - positions to check field at:
-    return np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
+def I_identity(r, multiplier=1): # r - positions to check field at:
+    return multiplier*np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
+
+def make_I_const(multiplier):
+    def I_fun(r):
+        return multiplier*np.ones((1, r.shape[1]), dtype=float)
+    return I_fun
 
 def make_const_beam(config: dict):
     def I_const(r):
