@@ -42,6 +42,7 @@ r_init, n_init = geometry.random_initial_conditions()
 # n_const = np.array([1/np.sqrt(3),1/np.sqrt(3),1/np.sqrt(3)],dtype=float)
 # r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
+
 # Run simulation
 sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
 results = sim.run(save_every=config["save_every"])
@@ -65,8 +66,8 @@ rm.save_plot(pc.render(), name= f"test_fig")
 # rm.save_plot(pc.render(), name = "orientation_decorelation")
 
 # # Gifs
-# rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False, fps=10), name="current", save_fps=10)
-# rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False, fps=10), name="hist", save_fps=10)
+rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False, fps=10), name="current", save_fps=10)
+rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False, fps=10), name="hist", save_fps=10)
 
 # x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 # nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]

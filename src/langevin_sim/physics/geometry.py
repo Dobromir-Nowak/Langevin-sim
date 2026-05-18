@@ -84,10 +84,8 @@ class Cuboid:
         returns None
         """
         if self.bc_type == "custom_bb":
-            for bb_dim in range(2):
-                enforce_bounceback(r_new,bb_dim,self.L,n)
-            bb_dim = 2
-            enforce_custom_bb(r_old, r_new, bb_dim, self.L, n, self.alpha)
+            for bb_dim in range(3):
+                enforce_custom_bb(r_old, r_new, bb_dim, self.L, n, self.alpha)
         if self.bc_type == "bb":
             for bb_dim in range(3):
                 enforce_bounceback(r_new, bb_dim, self.L,n)

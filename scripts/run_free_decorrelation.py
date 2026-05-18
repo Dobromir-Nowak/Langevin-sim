@@ -29,16 +29,21 @@ rm = ResultsManager(config_path=config_path, tag=file_name)
 geometry = None
 
 # Initial conditions
-r_const = np.array([0,0,0],dtype=float)
-n_const = np.array([1/np.sqrt(3),1/np.sqrt(3),1/np.sqrt(3)],dtype=float)
-r_init, _ = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
+# r_const = np.array([0,0,0],dtype=float)
+# n_const = np.array([1/np.sqrt(3),1/np.sqrt(3),1/np.sqrt(3)],dtype=float)
+# r_init, _ = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
-n_rand = np.random.normal(loc=0,scale=1, size = (config["dim"], config["N"]))
-n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+# n_rand = np.random.normal(loc=0,scale=1, size = (config["dim"], config["N"]))
+# n_init = n_rand/np.linalg.norm(n_rand, axis=0, keepdims=True)
+
+r_const = np.array([99,99,0],dtype=float)
+n_const = np.array([1/np.sqrt(3),1/np.sqrt(3),1/np.sqrt(3)],dtype=float)
+r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
 # Run simulation
 sim = Langevin_sim(config,I_fn=I_fn,f_fn=f_fn,r0=r_init, n0=n_init, geometry=geometry)
 results = sim.run(save_every=config["save_every"])
+sim.plot_trajectories()
 
 r, n = results["r"], results["n"]
 
