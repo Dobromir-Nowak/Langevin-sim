@@ -7,7 +7,7 @@ def reflect_orientation(n:np.ndarray, n_normal:np.ndarray):
     n_copy = n_copy - 2*n_normal * np.sum(n*n_normal,axis=0)
     return n_copy
 
-def enforce_bounceback(r, bb_dim, domain_dims,n): # r.shape = (dim, N_samples)
+def enforce_bounceback(r, bb_dim, domain_dims, n): # r.shape = (dim, N_samples)
     x_bb = r[bb_dim,:]
     Lx = domain_dims[bb_dim]
 
