@@ -192,9 +192,9 @@ def plot_hist_lin_ax(ax, r, config, axis=None, bins=20, n_plots=5, t_label=True,
     # making plots
     for idx_t, t in enumerate(t_list):
         if t_label:
-            ax.plot(x_bins, counts[idx_t,:], label=fr"$t={t:.0f}$")
+            ax.plot(x_bins, counts[idx_t,:], marker='.', markersize=2, markerfacecolor='black', markeredgecolor='black', label=fr"$t={t:.0f}$")
         else:
-            ax.plot(x_bins, counts[idx_t,:], label=fr"$t={t:.0f}$")
+            ax.plot(x_bins, counts[idx_t,:], marker='.', markersize=2, markerfacecolor='black', markeredgecolor='black', label=fr"$t={t:.0f}$")
         ax.set_xlabel(axis_names[axis])
         ax.set_ylabel("counts")
         if log: 

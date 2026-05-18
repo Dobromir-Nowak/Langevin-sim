@@ -59,6 +59,7 @@ pc.add(plot_hist_lin_ax, r, config, axis=2, t_label=True)
 pc.add(plot_hist_lin_ax, r, config, axis=0, t_label=False)
 rm.save_plot(pc.render(), name= f"test_fig")
 
+
 # # Orientation decorrelation
 # pc = PlotCollector()
 # pc.add(plot_n_correlation, n, config, absolute=True)
@@ -69,11 +70,11 @@ rm.save_plot(pc.render(), name= f"test_fig")
 rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False, fps=10), name="current", save_fps=10)
 rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False, fps=10), name="hist", save_fps=10)
 
-# x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
-# nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
-# pc = PlotCollector()
-# pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=20, bins_z=20)
-# pc.add(plot_density_ax, x, z, config)
-# pc.add(plot_hist_ax, z, axis_label="z", bins=20)
-# pc.add(plot_hist_ax, x, axis_label="x", bins=20)
-# rm.save_plot(pc.render(), name= f"joint_fig_t={config['Nt']*config['dt']}")
+x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
+nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
+pc = PlotCollector()
+pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=20, bins_z=20)
+pc.add(plot_density_ax, x, z, config)
+pc.add(plot_hist_ax, z, axis_label="z", bins=20)
+pc.add(plot_hist_ax, x, axis_label="x", bins=20)
+rm.save_plot(pc.render(), name= f"joint_fig_t={config['Nt']*config['dt']}")
