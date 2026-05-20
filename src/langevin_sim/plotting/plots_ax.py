@@ -128,7 +128,7 @@ def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis", xlab
 
     rho = np.zeros((bins_x, bins_z))
 
-    np.add.at(rho, (ix, iz), 1) #/ (dx * dz))
+    np.add.at(rho, (ix, iz), 1/(dx * dz))
 
     im = ax.imshow(
         rho.T,
@@ -215,7 +215,7 @@ def plot_current_magnitude_and_direction_ax(
     bins_x=20, bins_z=20,
     cmap="viridis"
 ):
-    v0 = 1 # config["v0"]
+    v0 = config["v0"]
 
     Lx = config["Lx"]
     Lz = config["Lz"]
@@ -232,8 +232,8 @@ def plot_current_magnitude_and_direction_ax(
     np.add.at(Jx, (ix, iz), v0*nx)
     np.add.at(Jz, (ix, iz), v0*nz)
 
-    # Jx /= (dx * dz) #TODO
-    # Jz /= (dx * dz)
+    Jx /= (dx * dz)
+    Jz /= (dx * dz)
 
     # magnitude
     J = np.sqrt(Jx**2 + Jz**2)
