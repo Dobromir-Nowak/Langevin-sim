@@ -81,7 +81,9 @@ def plot_hist_ax(
         ax.axhline(float(mean - s), linestyle=":", color="r",linewidth=1.)
         ax.legend(frameon=False)
 
-def plot_current_ax(ax, x, z, nx, nz, config, bins_x=20, bins_z=20):
+def plot_current_ax(ax, x, z, nx, nz, config, bins_x=20, bins_z=20, xlabel=r"$x$", ylabel=r"$z$", plot_label="Cell current density"):
+
+    v0 = config["v0"]
 
     Lx = config["Lx"]
     Lz = config["Lz"]
@@ -95,11 +97,11 @@ def plot_current_ax(ax, x, z, nx, nz, config, bins_x=20, bins_z=20):
     Jx = np.zeros((bins_x, bins_z))
     Jz = np.zeros((bins_x, bins_z))
 
-    np.add.at(Jx, (ix, iz), nx)
-    np.add.at(Jz, (ix, iz), nz)
+    np.add.at(Jx, (ix, iz), v0*nx)
+    np.add.at(Jz, (ix, iz), v0*nz)
 
-    Jx /= dx
-    Jz /= dz
+    Jx /= (dx*dz)
+    Jz /= (dx*dz)
 
     x_centers = (np.arange(bins_x) + 0.5) * dx
     z_centers = (np.arange(bins_z) + 0.5) * dz
@@ -110,10 +112,11 @@ def plot_current_ax(ax, x, z, nx, nz, config, bins_x=20, bins_z=20):
 
     ax.set_xlim(0, Lx)
     ax.set_ylim(0, Lz)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(plot_label)
 
-
-
-def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis"):
+def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis", xlabel = r"$x$", ylabel = r"$z$", cbar_label=r"$n$", plot_label="Cell density"):
     Lx = config["Lx"]
     Lz = config["Lz"]
 
@@ -125,7 +128,7 @@ def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis"):
 
     rho = np.zeros((bins_x, bins_z))
 
-    np.add.at(rho, (ix, iz), 1 / (dx * dz))
+    np.add.at(rho, (ix, iz), 1) #/ (dx * dz))
 
     im = ax.imshow(
         rho.T,
@@ -134,9 +137,14 @@ def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis"):
         aspect="auto",
         cmap=cmap
     )
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.set_label(cbar_label)
 
     ax.set_xlim(0, Lx)
     ax.set_ylim(0, Lz)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(plot_label)
 
 
 def plot_n_correlation(ax, n: np.ndarray, config: dict, absolute = False, log=False):
@@ -200,3 +208,69 @@ def plot_hist_lin_ax(ax, r, config, axis=None, bins=20, n_plots=5, t_label=True,
         if log: 
             ax.set_yscale('log')
         ax.legend()
+
+
+def plot_current_magnitude_and_direction_ax(
+    ax, x, z, nx, nz, config,
+    bins_x=20, bins_z=20,
+    cmap="viridis"
+):
+    v0 = 1 # config["v0"]
+
+    Lx = config["Lx"]
+    Lz = config["Lz"]
+
+    dx = Lx / bins_x
+    dz = Lz / bins_z
+
+    ix = np.clip((x / dx).astype(int), 0, bins_x - 1)
+    iz = np.clip((z / dz).astype(int), 0, bins_z - 1)
+
+    Jx = np.zeros((bins_x, bins_z))
+    Jz = np.zeros((bins_x, bins_z))
+
+    np.add.at(Jx, (ix, iz), v0*nx)
+    np.add.at(Jz, (ix, iz), v0*nz)
+
+    # Jx /= (dx * dz) #TODO
+    # Jz /= (dx * dz)
+
+    # magnitude
+    J = np.sqrt(Jx**2 + Jz**2)
+
+    # normalized direction field
+    eps = 1e-12
+    U = Jx / (J + eps)
+    V = Jz / (J + eps)
+
+    x_centers = (np.arange(bins_x) + 0.5) * dx
+    z_centers = (np.arange(bins_z) + 0.5) * dz
+
+    X, Z = np.meshgrid(x_centers, z_centers, indexing="ij")
+
+    # background magnitude field
+    im = ax.imshow(
+        J.T,
+        origin="lower",
+        extent=[0, Lx, 0, Lz],
+        aspect="auto",
+        cmap=cmap
+    )
+
+    plt.colorbar(im, ax=ax, label=r"$|\mathbf{J}|$")
+
+    # unit direction vectors
+    ax.quiver(
+        X, Z,
+        U, V,
+        color="white",
+        pivot="mid",
+        scale=30
+    )
+
+    ax.set_xlim(0, Lx)
+    ax.set_ylim(0, Lz)
+
+    ax.set_xlabel(r"$x$")
+    ax.set_ylabel(r"$z$")
+    ax.set_title("Current magnitude and direction")
