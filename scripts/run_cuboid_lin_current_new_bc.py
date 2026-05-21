@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from langevin_sim.utils.compute import I_identity, F, const_initial_conditions, const_initial_conditions_split, make_linear_grad_beam
+from langevin_sim.utils.compute import *
 from langevin_sim.utils.other import load_config
 from langevin_sim.plotting.plots import plot_hist
-from langevin_sim.plotting.plots_ax import PlotCollector, plot_hist_ax, plot_hist_lin_ax, plot_current_ax, plot_density_ax, plot_n_correlation, plot_current_magnitude_and_direction_ax
+from langevin_sim.plotting.plots_ax import *
 from langevin_sim.plotting.gifs import make_gif
 from langevin_sim.io.results import ResultsManager
 
@@ -80,4 +80,5 @@ pc.add(plot_density_ax, x, z, config, bins_x=bins_x, bins_z=bins_z)
 pc.add(plot_hist_ax, z, axis_label=r"z", bins=20)
 pc.add(plot_hist_ax, x, axis_label=r"x", bins=20)
 pc.add(plot_current_magnitude_and_direction_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
+pc.add(plot_mean_polarization_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
 rm.save_plot(pc.render(), name= f"joint_fig_t={config['Nt']*config['dt']}")

@@ -274,3 +274,55 @@ def plot_current_magnitude_and_direction_ax(
     ax.set_xlabel(r"$x$")
     ax.set_ylabel(r"$z$")
     ax.set_title("Current magnitude and direction")
+
+
+
+
+def plot_mean_polarization_ax(
+    ax, x, z, nx, nz, config,
+    bins_x=20, bins_z=20,
+    cmap="viridis"
+):
+
+    Lx = config["Lx"]
+    Lz = config["Lz"]
+
+    dx = Lx / bins_x
+    dz = Lz / bins_z
+
+    ix = np.clip((x / dx).astype(int), 0, bins_x - 1)
+    iz = np.clip((z / dz).astype(int), 0, bins_z - 1)
+
+    Px = np.zeros((bins_x, bins_z))
+    Pz = np.zeros((bins_x, bins_z))
+
+    bin_counts = np.zeros((bins_x, bins_z))
+
+    np.add.at(Px, (ix, iz), nx)
+    np.add.at(Pz, (ix, iz), nz)
+
+    np.add.at(bin_counts, (ix, iz), 1)
+
+    zero_mask = bin_counts == 0
+    Px[~zero_mask]/=bin_counts[~zero_mask]
+    Pz[~zero_mask]/=bin_counts[~zero_mask]
+
+    # magnitude
+    P = np.sqrt(Px**2 + Pz**2) # Px # Pz
+
+    x_centers = (np.arange(bins_x) + 0.5) * dx
+    z_centers = (np.arange(bins_z) + 0.5) * dz
+
+    X, Z = np.meshgrid(x_centers, z_centers, indexing="ij")
+
+    # background magnitude field
+    im = ax.imshow(
+        P.T,
+        origin="lower",
+        extent=[0, Lx, 0, Lz],
+        aspect="auto",
+        cmap=cmap
+    )
+
+    plt.colorbar(im, ax=ax, label=r"$|\mathbf{P}|$")
+    ax.set_title("Mean polarization")
