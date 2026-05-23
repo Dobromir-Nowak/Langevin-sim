@@ -18,18 +18,22 @@ from langevin_sim.physics.geometry import Cuboid
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
-file_name = "cuboid_lin_new_bc"
+file_name = "cuboid_current_new_bc"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 
 f_fn = F
 # I_fn = make_linear_grad_beam(config=config)
 
-sigma_beam = 30
+sigma_beam = 10
 x0 = 50
-def I_fn(r):
-    x, y = r[0,:], r[1,:]
-    return np.exp(-((x-x0)**2)/(2*sigma_beam**2))[None,:]
+# def I_fn(r):
+#     x, y = r[0,:], r[1,:]
+#     return np.exp(-((x-x0)**2)/(2*sigma_beam**2))[None,:]
+
+I_fn = make_const_beam(config)
+
+
 
 rm = ResultsManager(config_path=config_path, tag="cuboid_lin")
 
@@ -77,6 +81,7 @@ bins_x=20
 bins_z=20
 pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
 pc.add(plot_density_ax, x, z, config, bins_x=bins_x, bins_z=bins_z)
+pc.add(plot_density_ax, x, y, config, bins_x=bins_x, bins_z=bins_z) # xy
 pc.add(plot_hist_ax, z, axis_label=r"z", bins=20)
 pc.add(plot_hist_ax, x, axis_label=r"x", bins=20)
 pc.add(plot_current_magnitude_and_direction_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
