@@ -82,8 +82,8 @@ bins_z=20
 pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
 pc.add(plot_density_ax, x, z, config, bins_x=bins_x, bins_z=bins_z)
 pc.add(plot_density_ax, x, y, config, bins_x=bins_x, bins_z=bins_z) # xy
-pc.add(plot_hist_ax, z, axis_label=r"z", bins=20)
-pc.add(plot_hist_ax, x, axis_label=r"x", bins=20)
-pc.add(plot_current_magnitude_and_direction_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
-pc.add(plot_mean_polarization_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
+# pc.add(plot_hist_ax, z, axis_label=r"z", bins=20)
+# pc.add(plot_hist_ax, x, axis_label=r"x", bins=20)
+# pc.add(plot_current_magnitude_and_direction_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
+# pc.add(plot_mean_polarization_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z)
 rm.save_plot(pc.render(), name= f"joint_fig_t={config['Nt']*config['dt']}")
