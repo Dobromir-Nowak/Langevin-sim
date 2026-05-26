@@ -326,3 +326,28 @@ def plot_mean_polarization_ax(
 
     plt.colorbar(im, ax=ax, label=r"$|\mathbf{P}|$")
     ax.set_title("Mean polarization")
+
+
+
+def plot_density_rho_ax(
+    ax,
+    rho: np.ndarray,
+    bins: int = 40
+    ):
+    counts, edges = np.histogram(rho, bins=bins, range=(0,rho.max()))
+    N_counts = len(rho)
+
+    # bin centers and width
+    rho_centers = 0.5 * (edges[:-1] + edges[1:])
+    width = edges[1] - edges[0]
+    # computing density
+    rho2 = edges[1:]
+    rho1 = edges[:-1]
+    areas = np.pi*(rho2**2 - rho1**2)
+    density = counts/ (N_counts*areas)
+    # # alternative approximation
+    # density = counts / (N_counts * 2*np.pi*rho_centers*width)
+
+    ax.bar(rho_centers, density, width=width, align='center')
+    ax.set_xlabel(fr"$\rho$")
+    ax.set_ylabel("cell density")
