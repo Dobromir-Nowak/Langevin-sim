@@ -30,7 +30,7 @@ I_fn = make_I_Gaussian_beam(config)
 
 
 # Geometry
-geometry = Cylinder3D2(config=config)
+geometry = Cylinder3D(config=config)
 
 # Initial conditions
 r_init, n_init = geometry.random_initial_conditions()
