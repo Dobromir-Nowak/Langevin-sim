@@ -11,24 +11,20 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 # Simulation parameters
 dt: 0.1 # time step
 Nt: 1000 # number of time steps
-N: 32000 # number of samples/ABPs
+N: 8000 # number of samples/ABPs
 
 # Saving
-save_every: 200
+save_every: 1000
+
+# Gaussian beam parameters
+I: 1. # peak intensity
+sigma_beam: 1500. # width of the Gaussian beam
+
+# Cylinder parameters
+R_cylinder: 5000. # radius of the cylinder
+zmin: 0. # minimum z-coordinate of the cylinder
+zmax: 100. # maximum z-coordinate of the cylinder
 
 # Boundary conditions
 bc_type: "custom_bb" # "custom_bc" # boundary condition type ("bb" for standard bounce-back or "custom_bb" for custom bounce-back)
 alpha: 0.28 # angle of custom bounce-back (in radians)
-
-# # Beam parameters
-# axis: 0 # gradient axis (0, 1, or 2)
-# offset: 0.1 # value of the beam at the center
-# grad: 0.005 # 0.01  # gradient of the beam
-
-
-I: 1
-
-# Cuboid parameters
-Lx: 100. # length of the cuboid in x-direction
-Ly: 100. # length of the cuboid in y-direction
-Lz: 100. # length of the cuboid in z-direction

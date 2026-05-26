@@ -21,9 +21,10 @@ def compute_autocorr_n(n:np.ndarray)->np.ndarray:
 # Gaussian beam light intensity field
 def make_I_Gaussian_beam(config: dict):
     sigma_beam = config["sigma_beam"]
+    I = config.get("I", 1.)
     def I_Gaussian_beam(r): # r - positions to check field at:
         x, y = r[0,:], r[1,:]
-        return np.exp(-(x**2 + y**2)/(2*sigma_beam**2))[None,:] # has to return shape (1, r.shape[1]), r.shape[1] = N
+        return I*np.exp(-(x**2 + y**2)/(2*sigma_beam**2))[None,:] # has to return shape (1, r.shape[1]), r.shape[1] = N
     return I_Gaussian_beam
 
 def make_linear_grad_beam(config: dict):

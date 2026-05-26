@@ -11,7 +11,7 @@ def plot_hist_rho(
     show: bool = True
     ):
     fig, ax = plt.subplots()
-    ax.hist(rho, bins = bins)
+    ax.hist(rho, bins = bins, range=(0., rho.max()))
     ax.set_xlabel(fr"$\rho$")
     ax.set_ylabel("counts")
     if show:
@@ -30,7 +30,12 @@ def plot_density_rho(
     rho_centers = 0.5 * (edges[:-1] + edges[1:])
     width = edges[1] - edges[0]
     # computing density
-    density = counts / (N_counts * 2*np.pi*rho_centers*width)
+    rho2 = edges[1:]
+    rho1 = edges[:-1]
+    areas = np.pi*(rho2**2 - rho1**2)
+    density = counts/ (N_counts*areas)
+    # # alternative approximation
+    # density = counts / (N_counts * 2*np.pi*rho_centers*width)
 
     fig, ax = plt.subplots()
     ax.bar(rho_centers, density, width=width, align='center')
