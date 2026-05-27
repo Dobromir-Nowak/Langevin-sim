@@ -55,6 +55,69 @@ def enforce_custom_bb(r_old, r_new, bb_dim, domain_dims,n,alpha): # r.shape = (d
         print(x_bb[x_bb>Lx])
         raise ValueError(f"Spatial step too large in enforce_bounceback along axis {bb_dim}.")
 
+
+def enforce_custom_bb_split_step(r_old, r_new, bb_dim, domain_dims,n,alpha): # r.shape = (dim, N_samples)
+    x_old = r_old[bb_dim,:]
+    x_bb = r_new[bb_dim,:]
+    Lx = domain_dims[bb_dim]
+
+    # reflect orientation
+    if_bb_upper = x_bb>=Lx
+    if_bb_lower = x_bb<=0
+    if_any_bb = np.logical_or(if_bb_upper, if_bb_lower)
+    n_proj = np.copy(n)
+    n_proj[bb_dim,if_any_bb] = 0. # projection onto the plane
+
+    norms = np.linalg.norm(n_proj, axis=0)      # normalizing the projected orientation
+    zero_mask = norms == 0.0
+    if np.any(zero_mask):
+        raise ValueError(
+            f"Zero-norm orientation vectors detected at indices "
+            f"{np.where(zero_mask)[0]}")
+    n_proj /= norms
+
+    n[:,if_any_bb] = np.cos(alpha)*n_proj[:,if_any_bb] # changing in-plane components
+    n[bb_dim, if_bb_upper] = -np.sin(alpha)
+    n[bb_dim,if_bb_lower] = np.sin(alpha)
+
+
+    # Trajectory before and after hit + modifying the original r_new
+    #   Upper
+    r_old_upper = r_old[:, if_bb_upper]
+    r_new_upper = r_new[:, if_bb_upper]
+    n_new_upper = n[:, if_bb_upper]
+
+    x_old_upper = x_old[if_bb_upper]
+    x_new_upper = x_bb[if_bb_upper]
+
+    s_upper = (Lx - x_old_upper)/(x_new_upper-x_old_upper) # determining step split s
+
+    r_hit_upper = r_old_upper + s_upper[None,:] * (r_new_upper - r_old_upper) # hit point
+    r_new[:, if_bb_upper] = r_hit_upper + (1-s_upper)[None,:] * np.linalg.norm(r_new_upper-r_old_upper, axis=0, keepdims=True) * n_new_upper # modifying the original r_new vector
+
+    #   Lower
+    r_old_lower = r_old[:, if_bb_lower]
+    r_new_lower = r_new[:, if_bb_lower]
+    n_new_lower = n[:, if_bb_lower]
+
+    x_old_lower = x_old[if_bb_lower]
+    x_new_lower = x_bb[if_bb_lower]
+
+    s_lower = - x_old_lower / (x_new_lower - x_old_lower)
+
+    r_hit_lower = r_old_lower + s_lower[None,:] * (r_new_lower - r_old_lower) # hit point
+    r_new[:, if_bb_lower] = r_hit_lower + (1-s_lower)[None,:] * np.linalg.norm(r_new_lower-r_old_lower, axis=0, keepdims=True) * n_new_lower # modifying the original r_new vector
+
+    if np.any(x_bb>Lx) or np.any(x_bb<0):
+        print(x_bb[x_bb<0])
+        print(x_bb[x_bb>Lx])
+        raise ValueError(f"Function enforce_custom_bb_split_step failed.")
+
+def enforce_pbc(r_new, bb_dim, L):
+        Lx = L[bb_dim]
+        x_new = r_new[bb_dim,:]
+        r_new[bb_dim,:] = np.mod(x_new, Lx)
+
 class Cuboid:
     def __init__(self, config:dict):
         self.config = config
@@ -66,10 +129,15 @@ class Cuboid:
         if self.bc_type is None:
             raise ValueError("No bc_type declared in config.")
         
-        if self.bc_type != "custom_bb" and self.bc_type != "bb":
+        if self.bc_type != "custom_bb" and self.bc_type != "bb" and self.bc_type != "custom_bb+pbc":
             raise ValueError(f"{config["bc_type"]} is an incorrect bc_type.")
         
         if self.bc_type == "custom_bb":
+            self.alpha = config.get("alpha", None)
+            if self.alpha is None: 
+                raise ValueError("No alpha provided in config.")
+            
+        if self.bc_type =="custom_bb+pbc":
             self.alpha = config.get("alpha", None)
             if self.alpha is None: 
                 raise ValueError("No alpha provided in config.")
@@ -86,6 +154,11 @@ class Cuboid:
         if self.bc_type == "bb":
             for bb_dim in range(3):
                 enforce_bounceback(r_new, bb_dim, self.L,n)
+        if self.bc_type == "custom_bb+pbc":
+            split_step_dim = 2
+            enforce_custom_bb_split_step(r_old, r_new, split_step_dim, self.L, n, self.alpha)
+            for bb_dim in range(2):
+                enforce_pbc(r_new, bb_dim, self.L)
 
     def random_initial_conditions(self):
         
