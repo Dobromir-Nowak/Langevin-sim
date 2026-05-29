@@ -50,6 +50,19 @@ class PlotCollector:
 
         return fig
 
+def plot_ax(
+    ax,
+    x: np.ndarray,
+    y: np.ndarray,
+    x_label: str | None = None,
+    y_label: str | None = None
+    ):
+    if x_label is not None:
+        ax.set_xlabel(fr"{x_label}")
+    if y_label is not None:
+        ax.set_ylabel(fr"{y_label}")
+    ax.plot(x,y)
+
 def plot_hist_ax(
     ax, 
     x: np.ndarray,
@@ -160,11 +173,11 @@ def plot_n_correlation(ax, n: np.ndarray, config: dict, absolute = False, log=Fa
     if absolute:
         ax.plot(t_lin, np.abs(mean_dot_prod))
         ax.set_xlabel(r"$t$")
-        ax.set_ylabel(r"$|\langle \mathbf{n}(t)\cdot\mathbf{n}(0)\rangle|$")
+        ax.set_ylabel(r"$|\langle \hat{\mathbf{n}}(t)\cdot \hat{\mathbf{n}}(0)\rangle|$")
     else:
         ax.plot(t_lin, mean_dot_prod)
         ax.set_xlabel(r"$t$")
-        ax.set_ylabel(r"$\langle \mathbf{n}(t)\cdot\mathbf{n}(0)\rangle$")
+        ax.set_ylabel(r"$\langle \hat{\mathbf{n}}(t)\cdot\hat{\mathbf{n}}(0)\rangle$")
     if log: 
         ax.set_yscale('log')
 
@@ -351,3 +364,47 @@ def plot_density_rho_ax(
     ax.bar(rho_centers, density, width=width, align='center')
     ax.set_xlabel(fr"$\rho$")
     ax.set_ylabel("cell density")
+
+
+
+# TODO adjust to the use case  -- computing {axis} component of current density after binning over coordinate {axis}
+def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, axis_r=None, axis_n=None, bins=20, log=False):
+
+    
+    v0 = config["v0"]
+    L = np.array([config["Lx"], config["Ly"], config["Lz"]])
+    dx = L[axis_r]/bins
+    n_plots = r.shape[0]
+
+    if axis_r not in (0,1,2):
+        raise ValueError
+    if axis_n not in (0,1,2):
+        raise ValueError
+
+    x = r[:,axis_r,:]
+    nx = n[:,axis_n,:]
+    
+    ix = (x / dx).astype(int)
+    jx = np.zeros((n_plots, bins))
+
+    binning_indices = np.arange(n_plots)[:,None]*np.ones(ix.shape[1]).astype(int)
+    np.add.at(jx, (binning_indices, ix), v0*nx)
+    jx/= np.prod(L) / L[axis_r]*dx   #  = L_i * L_j * dx # TODO check if axis_r or axis_n
+
+    # making plots
+    x_axis_names = [r"$x$", r"$y$", r"$z$"]
+    y_axis_names = [r"$j_x$", r"$j_y$", r"$j_z$"]
+    x_bins = (np.arange(bins)+1/2)*dx
+
+
+    for idx in range(n_plots):
+        if par_vals is None:
+            ax.plot(x_bins, jx[idx,:], marker='.', markersize=2, markerfacecolor='black', markeredgecolor='black')
+        else:
+            par_vals_deg = (180/np.pi) * par_vals
+            ax.plot(x_bins, jx[idx,:], marker='.', markersize=2, markerfacecolor='black', markeredgecolor='black', label=fr"$\theta={par_vals_deg[idx]:.0f}^\circ$")
+        ax.set_xlabel(x_axis_names[axis_r])
+        ax.set_ylabel(y_axis_names[axis_n])
+        if log: 
+            ax.set_yscale('log')
+        ax.legend()

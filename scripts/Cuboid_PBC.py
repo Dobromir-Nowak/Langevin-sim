@@ -34,45 +34,44 @@ geometry = Cuboid(config=config)
 
 
 # Initial conditions
-# r_init, n_init = geometry.random_initial_conditions()
+r_init, n_init = geometry.random_initial_conditions()
+# r_const = np.array([50,50,97],dtype=float)
+# n_const = np.array([0,np.sqrt(1)/np.sqrt(10),np.sqrt(9)/np.sqrt(10)],dtype=float)
+# r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
-r_const = np.array([50,50,97],dtype=float)
-n_const = np.array([0,np.sqrt(1)/np.sqrt(10),np.sqrt(9)/np.sqrt(10)],dtype=float)
-r_init, n_init = const_initial_conditions(config=config, r_const=r_const, n_const=n_const)
 
-# Run simulation
-sim = Langevin_sim(config,I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-results = sim.run(save_every=config["save_every"])
-
-r, n = results["r"], results["n"]
-x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
-rho = np.sqrt(x**2+y**2)
+# r, n = results["r"], results["n"]
+# x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 
 
 
+# Run multiple simulations 
+Nth = 10
+angles = np.linspace(0,np.pi/2 - 1e-6, Nth)
 
-# Plotting
-sim.plot_trajectories(n_show=10)
+sim_ar = []
+
+n = np.zeros((Nth,config["dim"],config["N"]))
+r = np.zeros((Nth,config["dim"],config["N"]))
 
 
-
+for idx, angle in enumerate(angles):
+    sim = Langevin_sim(config, I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
+    sim.vec_I = np.array([-np.cos(angle),0,-np.sin(angle)])
+    results = sim.run(save_every=config["Nt"], is_history=False)
+    sim_ar.append(sim)
+    n[idx,:,:] = results["n"]
+    r[idx,:,:] = results["r"]
+# run computation and plot on n_all, r_all
 
 
 # # Plotting
-# rm.save_plot(plot_density_rho(rho), name="density_rho")
-# rm.save_plot(plot_hist_rho(rho), name="hist_rho")
-# rm.save_plot(plot_hist_z(z), name="hist_z")
-# # sim.plot_trajectories(aspect_ratio=[2*config["R_cylinder"], 2*config["R_cylinder"], config["zmax"]-config["zmin"]])
-
-
-
-# sim.plot_trajectories(show_cylinder=True, config=config) # No scalling, cylinder
+# sim.plot_trajectories()
 # sim.plot_trajectories(n_show=config["N"]) # Version with no scalling, all cells
 
 
-
-# pc = PlotCollector()
-# pc.add(plot_density_rho_ax, rho)
-# pc.add(plot_hist_ax, rho, axis_label=r"$\rho$")
-# pc.add(plot_hist_ax, z, axis_label=r"$z$")
-# rm.save_plot(pc.render(layout="row"), name= f"joint_fig_t={config['Nt']*config['dt']},N={config["N"]}")
+pc = PlotCollector()
+pc.add(plot_ax, 180/np.pi*angles, np.mean(n[:,0,:],axis=-1), x_label=r"$\theta\,[\textrm{deg}]$", y_label=r"$\langle \hat{n}_x \rangle$") # y_label=r"$V_s \langle \hat{\mathbf{n}}\rangle$")
+# pc.add(plot_current_ax, r[Nth//2,0,:], r[Nth//2,2,:], n[Nth//2,0,:], n[Nth//2,2,:], config)
+pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0)
+rm.save_plot(pc.render(layout="row"), name= f"joint_fig_t={config['Nt']*config['dt']:.0f},N={config["N"]}")
