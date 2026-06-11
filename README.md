@@ -5,4 +5,4 @@ How to use:
 4. Run "pip install -e ."
 5. Any of the scripts and notebooks can now be run.
 
-Jupyter notebooks can run without the above setup.
+Jupyter notebooks (see folder "notebooks") can be run without the above setup.
