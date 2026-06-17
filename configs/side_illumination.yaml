@@ -1,0 +1,29 @@
+# Constants
+D_r: 0.067 # rotation diffusion coefficient
+D: 0. # translational diffusion coefficient
+
+# Parameters
+dim: 3 # dimension of the problem
+v0: 10. # ABP speed
+w0: 1. # scale of angular velocity
+vec_I: [0., 0., -1.] # light direction (unit vector)
+
+# Simulation parameters
+dt: 0.1 # time step
+Nt: 1000 # number of time steps
+N: 8000 # number of samples/ABPs
+
+# Saving
+save_every: 50
+
+# Beam parameters
+I: 1. # intensity
+
+# Boundary conditions
+bc_type: "custom_bb" # boundary condition type ("bb" for standard bounce-back or "custom_bb" for custom bounce-back or "custom_bb+pbc" for pbc on axes 0,1 and custom bounce-back on axis 2)
+alpha: 0.28 # angle of custom bounce-back (in radians)
+
+# Cuboid parameters
+Lx: 100. # 4300. # length of the cuboid in x-direction
+Ly: 100. # 7500. # length of the cuboid in y-direction
+Lz: 100. # 100. # length of the cuboid in z-direction
