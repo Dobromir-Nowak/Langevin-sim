@@ -1,4 +1,4 @@
-## How to use: 
+## How to use
 1. Clone github repo.
 2. Ensure packages from reqs.txt are installed.
 3. Set project parent directory as current directory.
