@@ -1,11 +1,11 @@
-How to use: 
+## How to use: 
 1. Clone github repo.
 2. Ensure packages from reqs.txt are installed.
 3. Set project parent directory as current directory.
 4. Run "pip install -e ."
 5. Any of the scripts and notebooks can now be run.
 
-Jupyter notebooks (see folder "notebooks") can be run without the above setup.
+Jupyter notebooks (see folder `notebooks`) can be run without the above setup.
 
 
 
