@@ -49,7 +49,7 @@ r = results["r"]
 
 # Plotting
 
-bins = 20
+bins = 10
 x_max = 100
 
 r_last = r[-1,:]
@@ -64,6 +64,7 @@ n_filt = np.compress(filt, n_last, axis=-1)
 pc = PlotCollector()
 pc.add(plot_current_ax, r[-1,:], n[-1,:], config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins)
 pc.add(plot_current_ax, r_filt, n_filt, config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins, L=np.array([x_max, config["Ly"], config["Lz"]]))
+pc.add(plot_current_ax, r_filt, n_filt, config, axis_i=0, axis_j=1, bins_xi=bins, bins_xj=bins, L=np.array([x_max, config["Ly"], config["Lz"]]))
 # pc.add(plot_ax, x, y)
 # pc.add(plot_current_ax, r[Nth//2,0,:], r[Nth//2,2,:], n[Nth//2,0,:], n[Nth//2,2,:], config)
 # pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0)
