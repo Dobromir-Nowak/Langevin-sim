@@ -147,6 +147,7 @@ def plot_current_ax(
     bins_xj=20,
     plot_label="Cell current density",
     quiver_scale=None,
+    L=None
 ):
     if axis_i not in (0, 1, 2):
         raise ValueError("axis_i must be 0, 1, or 2")
@@ -157,7 +158,10 @@ def plot_current_ax(
 
     v0 = config["v0"]
 
-    L = np.array([config["Lx"], config["Ly"], config["Lz"]])
+    if L is None:
+        L = np.array([config["Lx"], config["Ly"], config["Lz"]])
+    else:
+        L=L
     dx_i = L[axis_i] / bins_xi
     dx_j = L[axis_j] / bins_xj
 

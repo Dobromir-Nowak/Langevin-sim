@@ -42,16 +42,28 @@ r_init, n_init = geometry.random_initial_conditions()
 
 
 sim = Langevin_sim(config, I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-sim.vec_I = np.array([1,0,0])
 results = sim.run(save_every=config["save_every"])
 n = results["n"]
 r = results["r"]
 
 
 # Plotting
-sim.plot_trajectories()
+
+bins = 20
+x_max = 100
+
+r_last = r[-1,:]
+n_last = n[-1,:]
+filt = r_last[0,:]<x_max
+
+
+r_filt = np.compress(filt, r_last, axis=-1)
+n_filt = np.compress(filt, n_last, axis=-1)
+
 
 pc = PlotCollector()
+pc.add(plot_current_ax, r[-1,:], n[-1,:], config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins)
+pc.add(plot_current_ax, r_filt, n_filt, config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins, L=np.array([x_max, config["Ly"], config["Lz"]]))
 # pc.add(plot_ax, x, y)
 # pc.add(plot_current_ax, r[Nth//2,0,:], r[Nth//2,2,:], n[Nth//2,0,:], n[Nth//2,2,:], config)
 # pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0)

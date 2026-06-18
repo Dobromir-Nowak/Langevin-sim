@@ -6,15 +6,15 @@ D: 0. # translational diffusion coefficient
 dim: 3 # dimension of the problem
 v0: 10. # ABP speed
 w0: 1. # scale of angular velocity
-vec_I: [0., 0., -1.] # light direction (unit vector)
+vec_I: [1., 0., 0.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.1 # time step
-Nt: 1000 # number of time steps
-N: 8000 # number of samples/ABPs
+Nt: 10000 # number of time steps
+N: 32000 # number of samples/ABPs
 
 # Saving
-save_every: 50
+save_every: 1000
 
 # Beam parameters
 I: 1. # intensity
@@ -24,6 +24,6 @@ bc_type: "custom_bb" # boundary condition type ("bb" for standard bounce-back or
 alpha: 0.28 # angle of custom bounce-back (in radians)
 
 # Cuboid parameters
-Lx: 100. # 4300. # length of the cuboid in x-direction
-Ly: 100. # 7500. # length of the cuboid in y-direction
-Lz: 100. # 100. # length of the cuboid in z-direction
+Lx: 4300. # length of the cuboid in x-direction
+Ly: 7500. # length of the cuboid in y-direction
+Lz: 100. # length of the cuboid in z-direction
