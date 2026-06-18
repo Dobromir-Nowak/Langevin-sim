@@ -94,70 +94,114 @@ def plot_hist_ax(
         ax.axhline(float(mean - s), linestyle=":", color="r",linewidth=1.)
         ax.legend(frameon=False)
 
-def plot_current_ax(ax, x, z, nx, nz, config, bins_x=20, bins_z=20, xlabel=r"$x$", ylabel=r"$z$", plot_label="Cell current density"):
 
-    v0 = config["v0"]
+def plot_density_ax(ax, r, config, axis_i, axis_j, bins_xi=20, bins_xj=20, cmap="viridis", cbar_label=r"$n$", plot_label="Cell density"):
+    
+    if axis_i not in (0,1,2):
+        raise ValueError
+    if axis_j not in (0,1,2):
+        raise ValueError
 
-    Lx = config["Lx"]
-    Lz = config["Lz"]
+    L = np.array([config["Lx"], config["Ly"], config["Lz"]])
+    dx_i = L[axis_i]/bins_xi
+    dx_j = L[axis_j]/bins_xj
 
-    dx = Lx / bins_x
-    dz = Lz / bins_z
+    x_i = r[axis_i,:]
+    x_j = r[axis_j,:]
 
-    ix = (x / dx).astype(int)
-    iz = (z / dz).astype(int)
+    x_axis_names = [r"$x$", r"$y$", r"$z$"]
+    
 
-    Jx = np.zeros((bins_x, bins_z))
-    Jz = np.zeros((bins_x, bins_z))
+    ix_i = (x_i / dx_i).astype(int)
+    ix_j = (x_j / dx_j).astype(int)
 
-    np.add.at(Jx, (ix, iz), v0*nx)
-    np.add.at(Jz, (ix, iz), v0*nz)
+    rho = np.zeros((bins_xi, bins_xj))
 
-    Jx /= (dx*dz)
-    Jz /= (dx*dz)
-
-    x_centers = (np.arange(bins_x) + 0.5) * dx
-    z_centers = (np.arange(bins_z) + 0.5) * dz
-
-    X, Z = np.meshgrid(x_centers, z_centers, indexing="ij")
-
-    ax.quiver(X, Z, Jx, Jz)
-
-    ax.set_xlim(0, Lx)
-    ax.set_ylim(0, Lz)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_title(plot_label)
-
-def plot_density_ax(ax, x, z, config, bins_x=20, bins_z=20, cmap="viridis", xlabel = r"$x$", ylabel = r"$z$", cbar_label=r"$n$", plot_label="Cell density"):
-    Lx = config["Lx"]
-    Lz = config["Lz"]
-
-    dx = Lx / bins_x
-    dz = Lz / bins_z
-
-    ix = (x / dx).astype(int)
-    iz = (z / dz).astype(int)
-
-    rho = np.zeros((bins_x, bins_z))
-
-    np.add.at(rho, (ix, iz), 1/(dx * dz))
+    np.add.at(rho, (ix_i, ix_j), 1/(dx_i * dx_j))
 
     im = ax.imshow(
         rho.T,
         origin="lower",
-        extent=[0, Lx, 0, Lz],
+        extent=[0, L[axis_i], 0, L[axis_j]],
         aspect="auto",
         cmap=cmap
     )
     cbar = plt.colorbar(im, ax=ax)
     cbar.set_label(cbar_label)
 
-    ax.set_xlim(0, Lx)
-    ax.set_ylim(0, Lz)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+    ax.set_xlim(0, L[axis_i])
+    ax.set_ylim(0, L[axis_j])
+    ax.set_xlabel(x_axis_names[axis_i])
+    ax.set_ylabel(x_axis_names[axis_j])
     ax.set_title(plot_label)
+
+
+def plot_current_ax(
+    ax,
+    r,
+    n,
+    config,
+    axis_i,
+    axis_j,
+    bins_xi=20,
+    bins_xj=20,
+    plot_label="Cell current density",
+    quiver_scale=None,
+):
+    if axis_i not in (0, 1, 2):
+        raise ValueError("axis_i must be 0, 1, or 2")
+    if axis_j not in (0, 1, 2):
+        raise ValueError("axis_j must be 0, 1, or 2")
+    if axis_i == axis_j:
+        raise ValueError("axis_i and axis_j must be different")
+
+    v0 = config["v0"]
+
+    L = np.array([config["Lx"], config["Ly"], config["Lz"]])
+    dx_i = L[axis_i] / bins_xi
+    dx_j = L[axis_j] / bins_xj
+
+    x_i = r[axis_i, :]
+    x_j = r[axis_j, :]
+
+    n_i = n[axis_i, :]
+    n_j = n[axis_j, :]
+
+    axis_names = [r"$x$", r"$y$", r"$z$"]
+
+    ix_i = (x_i / dx_i).astype(int)
+    ix_j = (x_j / dx_j).astype(int)
+
+    J_i = np.zeros((bins_xi, bins_xj))
+    J_j = np.zeros((bins_xi, bins_xj))
+
+    np.add.at(J_i, (ix_i, ix_j), v0 * n_i)
+    np.add.at(J_j, (ix_i, ix_j), v0 * n_j)
+
+    J_i /= dx_i * dx_j
+    J_j /= dx_i * dx_j
+
+    x_i_centers = (np.arange(bins_xi) + 0.5) * dx_i
+    x_j_centers = (np.arange(bins_xj) + 0.5) * dx_j
+
+    X_i, X_j = np.meshgrid(x_i_centers, x_j_centers, indexing="ij")
+
+    ax.quiver(
+        X_i,
+        X_j,
+        J_i,
+        J_j,
+        scale=quiver_scale,
+    )
+
+    ax.set_xlim(0, L[axis_i])
+    ax.set_ylim(0, L[axis_j])
+    ax.set_xlabel(axis_names[axis_i])
+    ax.set_ylabel(axis_names[axis_j])
+    ax.set_title(plot_label)
+
+
+
 
 
 def plot_n_correlation(ax, n: np.ndarray, config: dict, absolute = False, log=False):
@@ -367,7 +411,7 @@ def plot_density_rho_ax(
 
 
 
-# TODO adjust to the use case  -- computing {axis} component of current density after binning over coordinate {axis}
+# computing {axis} component of current density after binning over coordinate {axis}
 def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, axis_r=None, axis_n=None, bins=20, log=False):
 
     
