@@ -9,12 +9,12 @@ w0: 1. # scale of angular velocity
 vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
-dt: 0.1 # time step
-Nt: 1000 # number of time steps
+dt: 0.01 # time step
+Nt: 10000 # number of time steps
 N: 8000 # number of samples/ABPs
 
 # Saving
-save_every: 500
+save_every: 5000
 
 # Beam parameters
 I: 1. # intensity
@@ -24,6 +24,6 @@ bc_type: "custom_bb+pbc" # boundary condition type ("bb" for standard bounce-bac
 alpha: 0.28 # angle of custom bounce-back (in radians)
 
 # Cuboid parameters
-Lx: 100. # length of the cuboid in x-direction
-Ly: 100. # length of the cuboid in y-direction
-Lz: 100. # length of the cuboid in z-direction
+Lx: 100. # could as well be 2000. # length of the cuboid in x-direction
+Ly: 200. # length of the cuboid in y-direction
+Lz: 2. # length of the cuboid in z-direction
