@@ -36,6 +36,49 @@ def make_linear_grad_beam(config: dict):
         return vals[None,:]
     return I_linear
 
+def make_gated_intensity(base_fn, axis, lower, upper):
+    """
+    Return an intensity function I_fn(r) = base_fn(r) * 1_[lower, upper].
+
+    Parameters
+    ----------
+    base_fn : callable
+        Function of the full position array r. Must return shape (1, N).
+    axis : int
+        Coordinate index used for the gate.
+    lower : float
+        Lower bound of the active interval.
+    upper : float
+        Upper bound of the active interval.
+
+    Returns
+    -------
+    I_fn : callable
+        Function taking r with shape (dim, N) and returning intensity with shape (1, N).
+    """
+    if lower > upper:
+        raise ValueError("lower must be <= upper")
+
+    def I_gated(r):
+        if r.ndim != 2:
+            raise ValueError("r must have ndim == 2")
+        if axis < 0 or axis >= r.shape[0]:
+            raise ValueError("axis must satisfy 0 <= axis < r.shape[0]")
+
+        base_values = base_fn(r)
+        if base_values.shape != (1, r.shape[1]):
+            raise ValueError("base_fn(r) must return shape (1, N)")
+
+        coord = r[axis:axis+1, :]
+        mask = (coord >= lower) & (coord <= upper)
+        return base_values * mask
+
+    return I_gated
+
+
+
+
+
 # Unit light intensity field
 def I_identity(r, multiplier=1): # r - positions to check field at:
     return multiplier*np.ones((1, r.shape[1]), dtype=float)   # has to return shape (1, r.shape[1]), r.shape[1] = N
