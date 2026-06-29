@@ -28,8 +28,6 @@ f_fn = F
 import pandas as pd
 from scipy.interpolate import PchipInterpolator
 csv_path = Path("configs/mcwhl5_spectrum_digitized_from_plot_5nm.csv")
-print(csv_path)
-print(Path.cwd())
 spec = pd.read_csv(csv_path)
 
 lam_data = spec["wavelength_nm"].to_numpy()
@@ -44,16 +42,11 @@ S = PchipInterpolator(lam_normalized, S_data, extrapolate=False)
 lower = 500
 upper = 1500
 axis = 1 # y 
-I_min = 0.5
-I_max = 1.5
-
-def base_fn_lin(r:np.ndarray): 
-    x_i = r[axis,:][None,:] 
-    return (I_max - I_min)*(x_i - lower)/(upper - lower) + I_min
 
 def base_fn_spline(r:np.ndarray): 
     x_i = r[axis,:][None,:]
     x_i_scalled = (x_i - lower)/(upper - lower)
+    x_i_scalled = 1 - x_i_scalled # flipping to match lambda from 800 to 400
     return S(x_i_scalled)   # S - 1d spline
 
 I_fn = make_gated_intensity(base_fn_spline, axis=axis, lower=lower, upper=upper)
@@ -104,7 +97,6 @@ nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
 pc = PlotCollector()
 bins=20
 
-# pc.add(plot_current_ax, x, z, nx, nz, config, bins_x=bins_x, bins_z=bins_z) # TODO reimplement
 pc.add(plot_density_ax, r[-1,:], config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins) # xz
 pc.add(plot_density_ax, r[-1,:], config, axis_i=0, axis_j=1, bins_xi=bins, bins_xj=bins) # xy
 pc.add(plot_current_ax, r[-1,:], n[-1,:], config, axis_i=0, axis_j=2, bins_xi=bins, bins_xj=bins)
