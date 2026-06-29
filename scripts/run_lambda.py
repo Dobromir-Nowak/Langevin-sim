@@ -24,6 +24,22 @@ config = load_config(config_path=config_path)
 
 f_fn = F
 
+# Creating the spline
+import pandas as pd
+from scipy.interpolate import PchipInterpolator
+csv_path = Path("configs/mcwhl5_spectrum_digitized_from_plot_5nm.csv")
+print(csv_path)
+print(Path.cwd())
+spec = pd.read_csv(csv_path)
+
+lam_data = spec["wavelength_nm"].to_numpy()
+S_data = spec["normalized_intensity"].to_numpy()
+
+lam_normalized = (lam_data - lam_data.min())/(lam_data.max() - lam_data.min())
+
+S = PchipInterpolator(lam_normalized, S_data, extrapolate=False)
+
+# Creating the intensity profile
 
 lower = 500
 upper = 1500
@@ -31,11 +47,16 @@ axis = 1 # y
 I_min = 0.5
 I_max = 1.5
 
-def base_fn(r:np.ndarray): 
+def base_fn_lin(r:np.ndarray): 
     x_i = r[axis,:][None,:] 
     return (I_max - I_min)*(x_i - lower)/(upper - lower) + I_min
 
-I_fn = make_gated_intensity(base_fn, axis=axis, lower=lower, upper=upper)
+def base_fn_spline(r:np.ndarray): 
+    x_i = r[axis,:][None,:]
+    x_i_scalled = (x_i - lower)/(upper - lower)
+    return S(x_i_scalled)   # S - 1d spline
+
+I_fn = make_gated_intensity(base_fn_spline, axis=axis, lower=lower, upper=upper)
 
 rm = ResultsManager(config_path=config_path, tag=file_name)
 
