@@ -92,7 +92,7 @@ nx, ny, nz = n[:,0,:], n[:,1,:], n[:,2,:]
 # rm.save_gif(make_gif(x, z, nx, nz, plot_func=plot_current_ax, config=config, show=False, fps=10), name="current", save_fps=10)
 # rm.save_gif(make_gif(x, plot_func=plot_hist_ax, axis_label="x", show=False, fps=10), name="hist", save_fps=10)
 
-sim.plot_trajectories(aspect_ratio=[config["Lx"],config["Ly"],config["Lz"]])
+# sim.plot_trajectories(aspect_ratio=[config["Lx"],config["Ly"],config["Lz"]])
 
 x, y, z = r[-1,0,:], r[-1,1,:], r[-1,2,:]
 nx, ny, nz = n[-1,0,:], n[-1,1,:], n[-1,2,:]
@@ -124,12 +124,31 @@ rm.save_plot(pc.render(), name= f"joint_fig_t={config['Nt']*config['dt']}")
 
 
 
+def simulation_time_axis(r, config, t_offset=0.0):
+    """
+    Time axis for saved simulation frames.
+
+    r shape: (T, dim, N)
+    """
+    save_every = int(config.get("save_every", 1))
+    dt = float(config["dt"])
+    return t_offset + np.arange(r.shape[0]) * save_every * dt
 
 
+mask_t = (lower < r[:, 1, :]) & (r[:, 1, :] < upper)
+cell_count_t = np.sum(mask_t, axis=1)
+cell_fraction_t = cell_count_t / config["N"]
+t = simulation_time_axis(r,config)
 
 
-
-
+fig, ax = plt.subplots(figsize=(7.2, 4.2), constrained_layout=True)
+ax.plot(t, cell_fraction_t)
+ax.set_ylim(bottom=0)
+ax.set_xlabel(r"Time [s]")
+ax.set_ylabel(r"Fraction of cells")
+ax.set_title(rf"Fraction of cells such that ${lower}<y<{upper}$ over time")
+plt.show()
+rm.save_plot(fig, name=f"Cell_fraction_over_time")
 
 
 
