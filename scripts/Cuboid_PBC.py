@@ -47,22 +47,31 @@ r_init, n_init = geometry.random_initial_conditions()
 
 # Run multiple simulations 
 Nth = 10
-angles = np.linspace(0,np.pi/2 - 1e-6, Nth)
+angles = np.linspace(0,0.85, Nth)
 
 sim_ar = []
 
 n = np.zeros((Nth,config["dim"],config["N"]))
 r = np.zeros((Nth,config["dim"],config["N"]))
 
+plot_every = 3
+indices_selected = np.arange(0, Nth, plot_every) # np.zeros((Nth+1)//2)
+angles_selected = angles[indices_selected]
+n_selected = np.zeros((len(indices_selected),config["dim"],config["N"]))
+r_selected = np.zeros((len(indices_selected),config["dim"],config["N"]))
+
 
 for idx, angle in enumerate(angles):
     sim = Langevin_sim(config, I_fn=I_fn, f_fn=f_fn, r0=r_init, n0=n_init, geometry=geometry, results_manager=rm)
-    sim.vec_I = np.array([-np.cos(angle),0,-np.sin(angle)])
+    sim.vec_I = np.array([-np.sin(angle),0,-np.cos(angle)])
     results = sim.run(save_every=config["Nt"], is_history=False)
     sim_ar.append(sim)
     n[idx,:,:] = results["n"]
     r[idx,:,:] = results["r"]
-# run computation and plot on n_all, r_all
+    
+    if idx in indices_selected:
+        n_selected[idx//plot_every,:,:] = results["n"]
+        r_selected[idx//plot_every,:,:] = results["r"]
 
 
 # # Plotting
@@ -71,7 +80,7 @@ for idx, angle in enumerate(angles):
 
 
 pc = PlotCollector()
-pc.add(plot_ax, 180/np.pi*angles, np.mean(n[:,0,:],axis=-1), x_label=r"$\theta\,[\textrm{deg}]$", y_label=r"$\langle \hat{n}_x \rangle$") # y_label=r"$V_s \langle \hat{\mathbf{n}}\rangle$")
-# pc.add(plot_current_ax, r[Nth//2,0,:], r[Nth//2,2,:], n[Nth//2,0,:], n[Nth//2,2,:], config)
-pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0)
+pc.add(plot_ax, 180/np.pi*angles, np.mean(n[:,0,:],axis=-1),y_error = 1, x_label=r"$\theta\,[\textrm{deg}]$", y_label=r"$\langle \hat{n}_x \rangle$") # y_label=r"$V_s \langle \hat{\mathbf{n}}\rangle$")
+pc.add(plot_current_lin_ax, r_selected, n_selected, config, par_vals = angles_selected, axis_r=2, axis_n=0)
+# pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0) # plot for all angles
 rm.save_plot(pc.render(layout="row"), name= f"joint_fig_t={config['Nt']*config['dt']:.0f},N={config["N"]}")

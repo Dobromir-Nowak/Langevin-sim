@@ -55,13 +55,15 @@ def plot_ax(
     x: np.ndarray,
     y: np.ndarray,
     x_label: str | None = None,
-    y_label: str | None = None
+    y_label: str | None = None,
+    y_error: np.ndarray | None = None
     ):
     if x_label is not None:
         ax.set_xlabel(fr"{x_label}")
     if y_label is not None:
         ax.set_ylabel(fr"{y_label}")
     ax.plot(x,y)
+    ax.errorbar(x,y,yerr=y_error)
 
 def plot_hist_ax(
     ax, 
