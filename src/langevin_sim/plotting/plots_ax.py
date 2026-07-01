@@ -63,7 +63,11 @@ def plot_ax(
     if y_label is not None:
         ax.set_ylabel(fr"{y_label}")
     ax.plot(x,y)
-    ax.errorbar(x,y,yerr=y_error)
+    ax.errorbar(x,y,yerr=y_error,
+    fmt='.',
+    markersize=3,
+    capsize=2,
+    color='black')
 
 def plot_hist_ax(
     ax, 
@@ -439,7 +443,7 @@ def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, ax
 
     binning_indices = np.arange(n_plots)[:,None]*np.ones(ix.shape[1]).astype(int)
     np.add.at(jx, (binning_indices, ix), v0*nx)
-    jx/= np.prod(L) / L[axis_r]*dx   #  = L_i * L_j * dx # TODO check if axis_r or axis_n
+    jx/= np.prod(L) / L[axis_r]*dx   #  = L_i * L_j * dx
 
     # making plots
     x_axis_names = [r"$x$", r"$y$", r"$z$"]

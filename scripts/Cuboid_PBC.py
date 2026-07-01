@@ -47,7 +47,7 @@ r_init, n_init = geometry.random_initial_conditions()
 
 # Run multiple simulations 
 Nth = 10
-angles = np.linspace(0,0.85, Nth)
+angles = np.linspace(0, 0.85, Nth)
 
 sim_ar = []
 
@@ -80,7 +80,9 @@ for idx, angle in enumerate(angles):
 
 
 pc = PlotCollector()
-pc.add(plot_ax, 180/np.pi*angles, np.mean(n[:,0,:],axis=-1),y_error = 1, x_label=r"$\theta\,[\textrm{deg}]$", y_label=r"$\langle \hat{n}_x \rangle$") # y_label=r"$V_s \langle \hat{\mathbf{n}}\rangle$")
-pc.add(plot_current_lin_ax, r_selected, n_selected, config, par_vals = angles_selected, axis_r=2, axis_n=0)
+nx = n[:,0,:]
+sigma_nx = 1/np.sqrt(config["N"]) * np.std(nx,axis=-1,ddof=1)
+pc.add(plot_ax, 180/np.pi*angles, np.mean(nx,axis=-1), y_error=sigma_nx, x_label=r"$\theta\,[\textrm{deg}]$", y_label=r"$\langle \hat{n}_x \rangle$") # y_label=r"$V_s \langle \hat{\mathbf{n}}\rangle$")
+pc.add(plot_current_lin_ax, r_selected, n_selected, config, par_vals = angles_selected, axis_r=2, axis_n=0, bins=20)
 # pc.add(plot_current_lin_ax, r, n, config, par_vals = angles, axis_r=2, axis_n=0) # plot for all angles
 rm.save_plot(pc.render(layout="row"), name= f"joint_fig_t={config['Nt']*config['dt']:.0f},N={config["N"]}")
