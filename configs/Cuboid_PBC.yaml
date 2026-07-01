@@ -11,7 +11,7 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 # Simulation parameters
 dt: 0.1 # time step
 Nt: 1000 # number of time steps
-N: 800 # number of samples/ABPs
+N: 8000 # number of samples/ABPs
 
 # Saving
 save_every: 500

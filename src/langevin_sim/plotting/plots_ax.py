@@ -420,9 +420,56 @@ def plot_density_rho_ax(
     ax.set_ylabel("cell density")
 
 
+# helper function for plot_current_lin_ax
+def bin_sum_1d(x, Y, L, bins):
+    """
+    x, Y shape: (n_plots, N)
+    
+    Computes S_b = sum_{i in b} Y_i
+    and uncertainty dS_b using
+
+        Var(S_b) = N [p_b sigma_b^2 + p_b(1-p_b) m_b^2]
+
+    returns
+        x_bins: coordinates
+        dx: interval
+        S: array of binned sums S_b
+        dS: array of uncertainties of S_b
+        counts: array of counts in bins
+    """
+
+    dx = L / bins
+    x_bins = (np.arange(bins) + 0.5) * dx
+
+    ix = (x / dx).astype(int) # shape: (n_plots, N)
+
+    n_plots, N = x.shape
+
+    S = np.zeros((n_plots, bins))
+    dS = np.zeros((n_plots, bins))
+    counts = np.zeros((n_plots, bins), dtype=int)
+
+    for k in range(n_plots):
+        for b in range(bins):
+            vals = Y[k, ix[k] == b]  # Y_i in bin b
+
+            counts[k, b] = len(vals)
+            S[k, b] = np.sum(vals)
+
+            if len(vals) > 1:
+                p = len(vals) / N
+                m = np.mean(vals)
+                var_cond = np.var(vals, ddof=1) # variance of Y in each of the bins (conditional on binning)
+
+                var_S = N * (p * var_cond + p * (1 - p) * m**2)
+                dS[k, b] = np.sqrt(var_S)
+
+    return x_bins, dx, S, dS, counts
+
+
 
 # computing {axis} component of current density after binning over coordinate {axis}
-def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, axis_r=None, axis_n=None, bins=20, log=False):
+def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, axis_r=None, axis_n=None, bins=20, log=False, normalize_by_N=False, errorbars=False):
 
     
     v0 = config["v0"]
@@ -438,17 +485,21 @@ def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, ax
     x = r[:,axis_r,:]
     nx = n[:,axis_n,:]
     
-    ix = (x / dx).astype(int)
-    jx = np.zeros((n_plots, bins))
+    x_bins, dx, S, dS, _ = bin_sum_1d(x, nx, L[axis_r], bins)
 
-    binning_indices = np.arange(n_plots)[:,None]*np.ones(ix.shape[1]).astype(int)
-    np.add.at(jx, (binning_indices, ix), v0*nx)
-    jx/= np.prod(L) / L[axis_r]*dx   #  = L_i * L_j * dx
+    bin_volume = (np.prod(L) / L[axis_r]) * dx
+
+    jx = v0 * S / bin_volume
+    djx = v0 * dS / bin_volume
+    if normalize_by_N:
+        jx/=config["N"]
+        djx/=config["N"]
 
     # making plots
     x_axis_names = [r"$x$", r"$y$", r"$z$"]
     y_axis_names = [r"$j_x$", r"$j_y$", r"$j_z$"]
-    x_bins = (np.arange(bins)+1/2)*dx
+    if normalize_by_N:
+        y_axis_names = [r"$j_x /N$", r"$j_y /N$", r"$j_z /N$"]
 
 
     for idx in range(n_plots):
@@ -457,6 +508,8 @@ def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, ax
         else:
             par_vals_deg = (180/np.pi) * par_vals
             ax.plot(x_bins, jx[idx,:], marker='.', markersize=2, markerfacecolor='black', markeredgecolor='black', label=fr"$\theta={par_vals_deg[idx]:.0f}^\circ$")
+        if errorbars:
+            ax.errorbar(x_bins, jx[idx,:], yerr=djx[idx,:], fmt=".", markersize=2, capsize=2,color='black')
         ax.set_xlabel(x_axis_names[axis_r])
         ax.set_ylabel(y_axis_names[axis_n])
         if log: 
