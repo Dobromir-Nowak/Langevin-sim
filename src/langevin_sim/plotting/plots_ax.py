@@ -515,3 +515,197 @@ def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, ax
         if log: 
             ax.set_yscale('log')
         ax.legend()
+
+
+
+def plot_density_rho_time_ax(
+    ax,
+    r,
+    config,
+    t_idx_list=None,
+    bins=40,
+    R=None,
+    errorbars=True,
+    normalize_by_N=True,
+    log=False,
+):
+    """
+    Radial density profiles in a cylinder for several saved times.
+
+    r shape: (nt, 3, N)
+    density is normalized by N by default, as in plot_density_rho_ax.
+    """
+
+    rho = np.sqrt(r[:, 0, :]**2 + r[:, 1, :]**2)   # (nt, N)
+    nt, N = rho.shape
+
+    if t_idx_list is None:
+        t_idx_list = np.arange(nt)
+
+    t_idx_list = np.asarray(t_idx_list, dtype=int)
+    rho = rho[t_idx_list, :]
+
+    if R is None:
+        R = config["R_cylinder"]
+
+    drho = R / bins
+    rho_bins = (np.arange(bins) + 0.5) * drho
+
+    edges = np.linspace(0, R, bins + 1)
+
+    H = config["zmax"] - config["zmin"]   # cylinder height
+    volumes = np.pi * (edges[1:]**2 - edges[:-1]**2) * H
+
+    ix = np.clip((rho / drho).astype(int), 0, bins - 1)
+
+    counts = np.zeros((len(t_idx_list), bins), dtype=int)
+    binning_indices = np.arange(len(t_idx_list))[:, None] * np.ones(ix.shape, dtype=int)
+
+    np.add.at(counts, (binning_indices, ix), 1)
+
+    p = counts / N
+
+    if normalize_by_N:
+        density = p / volumes
+        density_error = np.sqrt(p * (1 - p) / N) / volumes
+        ylabel = "normalized cell density"
+    else:
+        density = counts / volumes
+        density_error = np.sqrt(N * p * (1 - p)) / volumes
+        ylabel = "cell density"
+
+    t_vals = config["dt"] * config["save_every"] * t_idx_list
+
+    for k, t in enumerate(t_vals):
+        label = fr"$t={t:.0f}$"
+
+        if errorbars:
+            ax.errorbar(
+                rho_bins,
+                density[k],
+                yerr=density_error[k],
+                fmt=".-",
+                markersize=2,
+                capsize=2,
+                linewidth=1,
+                label=label,
+            )
+        else:
+            ax.plot(
+                rho_bins,
+                density[k],
+                ".-",
+                markersize=2,
+                linewidth=1,
+                label=label,
+            )
+
+    ax.set_xlim(0, R)
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel(r"$\rho$")
+    ax.set_ylabel(ylabel)
+
+    if log:
+        ax.set_yscale("log")
+
+    ax.legend(frameon=False)
+
+
+def plot_density_z_time_ax(
+    ax,
+    r,
+    config,
+    t_idx_list=None,
+    bins=40,
+    errorbars=True,
+    normalize_by_N=True,
+    log=False,
+    legend=True
+):
+    """
+    z-density profiles in a cylinder for several saved times.
+
+    r shape: (nt, 3, N)
+
+    If normalize_by_N=True:
+        sum_b density_b * V_b ~= 1
+
+    If normalize_by_N=False:
+        sum_b density_b * V_b ~= N
+    """
+
+    z = r[:, 2, :]  # (nt, N)
+    nt, N = z.shape
+
+    if t_idx_list is None:
+        t_idx_list = np.arange(nt)
+
+    t_idx_list = np.asarray(t_idx_list, dtype=int)
+    z = z[t_idx_list, :]
+
+    zmin = config["zmin"]
+    zmax = config["zmax"]
+    R = config["R_cylinder"]
+
+    dz = (zmax - zmin) / bins
+    z_bins = zmin + (np.arange(bins) + 0.5) * dz
+
+    # volume of each cylindrical slab
+    bin_volume = np.pi * R**2 * dz
+
+    iz = np.clip(((z - zmin) / dz).astype(int), 0, bins - 1)
+
+    counts = np.zeros((len(t_idx_list), bins), dtype=int)
+    binning_indices = np.arange(len(t_idx_list))[:, None] * np.ones(iz.shape, dtype=int)
+
+    np.add.at(counts, (binning_indices, iz), 1)
+
+    p = counts / N
+
+    if normalize_by_N:
+        density = p / bin_volume
+        density_error = np.sqrt(p * (1 - p) / N) / bin_volume
+        ylabel = r"normalized cell density"
+    else:
+        density = counts / bin_volume
+        density_error = np.sqrt(N * p * (1 - p)) / bin_volume
+        ylabel = r"cell density"
+
+    t_vals = config["dt"] * config["save_every"] * t_idx_list
+
+    for k, t in enumerate(t_vals):
+        label = fr"$t={t:.0f}$"
+        if errorbars:
+            ax.errorbar(
+                z_bins,
+                density[k],
+                yerr=density_error[k],
+                fmt=".-",
+                markersize=2,
+                capsize=2,
+                linewidth=1,
+                label=label,
+            )
+        else:
+            ax.plot(
+                z_bins,
+                density[k],
+                ".-",
+                markersize=2,
+                linewidth=1,
+                label=label,
+            )
+
+    ax.set_xlim(zmin, zmax)
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel(r"$z$")
+    ax.set_ylabel(ylabel)
+
+    if log:
+        ax.set_yscale("log")
+    if legend:
+        ax.legend(frameon=False)
+
+
+
+    
