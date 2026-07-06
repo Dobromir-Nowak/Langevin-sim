@@ -528,6 +528,7 @@ def plot_density_rho_time_ax(
     errorbars=True,
     normalize_by_N=True,
     log=False,
+    ylabel=None
 ):
     """
     Radial density profiles in a cylinder for several saved times.
@@ -568,11 +569,9 @@ def plot_density_rho_time_ax(
     if normalize_by_N:
         density = p / volumes
         density_error = np.sqrt(p * (1 - p) / N) / volumes
-        ylabel = "normalized cell density"
     else:
         density = counts / volumes
         density_error = np.sqrt(N * p * (1 - p)) / volumes
-        ylabel = "cell density"
 
     t_vals = config["dt"] * config["save_every"] * t_idx_list
 
@@ -586,6 +585,9 @@ def plot_density_rho_time_ax(
                 yerr=density_error[k],
                 fmt=".-",
                 markersize=2,
+                markerfacecolor='black',
+                markeredgecolor='black',
+                # ecolor='black',
                 capsize=2,
                 linewidth=1,
                 label=label,
@@ -594,7 +596,9 @@ def plot_density_rho_time_ax(
             ax.plot(
                 rho_bins,
                 density[k],
-                ".-",
+                ".",
+                markerfacecolor='black',
+                markeredgecolor='black',
                 markersize=2,
                 linewidth=1,
                 label=label,
@@ -603,7 +607,7 @@ def plot_density_rho_time_ax(
     ax.set_xlim(0, R)
     ax.set_ylim(bottom=0)
     ax.set_xlabel(r"$\rho$")
-    ax.set_ylabel(ylabel)
+    ax.set_ylabel(ylabel=ylabel)
 
     if log:
         ax.set_yscale("log")
@@ -620,7 +624,8 @@ def plot_density_z_time_ax(
     errorbars=True,
     normalize_by_N=True,
     log=False,
-    legend=True
+    legend=True,
+    ylabel=None
 ):
     """
     z-density profiles in a cylinder for several saved times.
@@ -665,11 +670,9 @@ def plot_density_z_time_ax(
     if normalize_by_N:
         density = p / bin_volume
         density_error = np.sqrt(p * (1 - p) / N) / bin_volume
-        ylabel = r"normalized cell density"
     else:
         density = counts / bin_volume
         density_error = np.sqrt(N * p * (1 - p)) / bin_volume
-        ylabel = r"cell density"
 
     t_vals = config["dt"] * config["save_every"] * t_idx_list
 
@@ -683,6 +686,8 @@ def plot_density_z_time_ax(
                 fmt=".-",
                 markersize=2,
                 capsize=2,
+                markerfacecolor='black',
+                markeredgecolor='black',
                 linewidth=1,
                 label=label,
             )
@@ -699,7 +704,7 @@ def plot_density_z_time_ax(
     ax.set_xlim(zmin, zmax)
     ax.set_ylim(bottom=0)
     ax.set_xlabel(r"$z$")
-    ax.set_ylabel(ylabel)
+    ax.set_ylabel(ylabel=ylabel)
 
     if log:
         ax.set_yscale("log")

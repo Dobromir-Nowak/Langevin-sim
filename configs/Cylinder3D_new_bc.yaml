@@ -10,11 +10,11 @@ vec_I: [0., 0., -1.] # light direction (unit vector)
 
 # Simulation parameters
 dt: 0.1 # time step
-Nt: 1200 # number of time steps
+Nt: 12000 # number of time steps
 N: 32000 # number of samples/ABPs
 
 # Saving
-save_every: 400
+save_every: 4000
 
 # Gaussian beam parameters
 I: 1. # peak intensity

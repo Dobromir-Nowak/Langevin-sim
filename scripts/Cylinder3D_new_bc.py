@@ -63,7 +63,8 @@ pc.add(
     t_idx_list=t_idx_list,
     bins=bins,
     errorbars=True,
-    normalize_by_N=True,
+    normalize_by_N=False,
+    ylabel=r"$n(\rho)$"
 )
 
 pc.add(
@@ -73,12 +74,12 @@ pc.add(
     t_idx_list=t_idx_list,
     bins=bins,
     errorbars=True,
-    normalize_by_N=True,
-    legend=False
+    normalize_by_N=False,
+    legend=False,
+    ylabel=r"$n(z)$"
 )
 
 fig = pc.render(layout="row", show=True)
-fig.tight_layout(pad=0.5)
 
 rm.save_plot(
     fig,
