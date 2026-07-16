@@ -41,14 +41,13 @@ S = PchipInterpolator(lam_normalized, S_data, extrapolate=False)
 
 lower = 500
 upper = 1500
-axis = 1 # y 
-I_multiplier = 10. # peak intensity
+axis = 1 # y
 
 def base_fn_spline(r:np.ndarray): 
     x_i = r[axis,:][None,:]
     x_i_scalled = (x_i - lower)/(upper - lower)
     x_i_scalled = 1 - x_i_scalled # flipping to match lambda from 800 to 400
-    return I_multiplier*S(x_i_scalled)   # S - 1d spline
+    return config["I"]*S(x_i_scalled)   # S - 1d spline
 
 I_fn = make_gated_intensity(base_fn_spline, axis=axis, lower=lower, upper=upper)
 
