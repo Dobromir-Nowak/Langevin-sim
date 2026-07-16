@@ -27,7 +27,7 @@ f_fn = F
 # Creating the spline
 import pandas as pd
 from scipy.interpolate import PchipInterpolator
-csv_path = Path("configs/mcwhl5_spectrum_digitized_from_plot_5nm.csv")
+csv_path = Path("data/mcwhl5_spectrum_digitized_from_plot_5nm.csv")
 spec = pd.read_csv(csv_path)
 
 lam_data = spec["wavelength_nm"].to_numpy()

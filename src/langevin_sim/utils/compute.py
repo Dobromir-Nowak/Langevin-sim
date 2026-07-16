@@ -71,7 +71,7 @@ def make_gated_intensity(base_fn, axis, lower, upper):
 
         coord = r[axis:axis+1, :]
         mask = (coord >= lower) & (coord <= upper)
-        return base_values * mask
+        return np.where(mask, base_values, 0.0) # base_values * mask
 
     return I_gated
 
