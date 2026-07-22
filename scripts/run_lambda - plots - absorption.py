@@ -18,7 +18,7 @@ from langevin_sim.physics.geometry import Cuboid
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
-file_name = "cuboid_lambda"
+file_name = "cuboid_lambda_callibration"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 

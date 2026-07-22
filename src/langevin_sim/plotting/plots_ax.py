@@ -456,3 +456,140 @@ def plot_current_lin_ax(ax, r, n, config, par_vals: np.ndarray | None = None, ax
         if log: 
             ax.set_yscale('log')
         ax.legend()
+
+
+
+
+def plot_trajectories_2d_ax(
+    ax,
+    r_history: np.ndarray,
+    excluded_axis: int | None = None,
+    n_show: int = 50,
+    config: dict | None = None,
+    axis_limits: tuple[tuple[float, float], tuple[float, float]] | None = None,
+    periodic_axes: tuple[int, ...] | None = None,
+    break_periodic_jumps: bool = True,
+    start_color: str = "k",
+    end_color: str = "r",
+    line_alpha: float = 0.7,
+    marker_alpha: float = 0.7,
+    line_width: float = 1.0,
+    start_size: float = 10.0,
+    end_size: float = 12.0,
+    equal_aspect: bool = True,
+    grid: bool = True,
+):
+    """Plot 2D trajectories from a 2D history or a projection of a 3D history.
+
+    ``r_history`` must have shape ``(n_times, dim, n_particles)``. For 3D
+    histories, ``excluded_axis`` selects the coordinate omitted from the plot:
+    0 -> y-z, 1 -> x-z, 2 -> x-y.
+
+    For wrapped periodic coordinates, set ``periodic_axes`` to the corresponding
+    original coordinate indices. Discontinuities larger than half the domain
+    length are then broken instead of being drawn across the entire plot.
+    """
+    r_history = np.asarray(r_history)
+    if r_history.ndim != 3:
+        raise ValueError(
+            "r_history must have shape (n_times, dim, n_particles); "
+            f"got {r_history.shape}"
+        )
+
+    n_times, dim, n_particles = r_history.shape
+    if n_times == 0 or n_particles == 0:
+        raise ValueError("r_history must contain at least one time and one particle")
+
+    if dim == 2:
+        if excluded_axis is not None:
+            raise ValueError("excluded_axis must be None for a 2D history")
+        plot_axes = (0, 1)
+    elif dim == 3:
+        if excluded_axis not in (0, 1, 2):
+            raise ValueError("excluded_axis must be 0, 1, or 2 for a 3D history")
+        plot_axes = tuple(axis for axis in range(3) if axis != excluded_axis)
+    else:
+        raise ValueError(f"Only 2D and 3D histories are supported; got dim={dim}")
+
+    axis_names = ("x", "y", "z")
+    side_names = ("Lx", "Ly", "Lz")
+
+    if periodic_axes is None:
+        # This matches the current Cuboid implementation: x and y are periodic
+        # when bc_type == "custom_bb+pbc", while z uses custom bounce-back.
+        periodic_axes = (0, 1) if config and config.get("bc_type") == "custom_bb+pbc" else ()
+    invalid_periodic_axes = set(periodic_axes) - set(range(dim))
+    if invalid_periodic_axes:
+        raise ValueError(f"Invalid periodic axes: {sorted(invalid_periodic_axes)}")
+
+    n_show = min(max(int(n_show), 1), n_particles)
+    particle_indices = np.linspace(0, n_particles - 1, n_show, dtype=int)
+    axis_0, axis_1 = plot_axes
+
+    def plotted_coordinates(particle: int):
+        coordinate_0 = r_history[:, axis_0, particle]
+        coordinate_1 = r_history[:, axis_1, particle]
+
+        if not break_periodic_jumps or n_times < 2:
+            return coordinate_0, coordinate_1
+
+        breaks = np.zeros(n_times - 1, dtype=bool)
+        for axis, coordinate in ((axis_0, coordinate_0), (axis_1, coordinate_1)):
+            if axis in periodic_axes:
+                if config is None or side_names[axis] not in config:
+                    raise ValueError(
+                        f"config['{side_names[axis]}'] is required to break "
+                        f"periodic jumps along {axis_names[axis]}"
+                    )
+                domain_length = float(config[side_names[axis]])
+                breaks |= np.abs(np.diff(coordinate)) > 0.5 * domain_length
+
+        if not np.any(breaks):
+            return coordinate_0, coordinate_1
+
+        insertion_indices = np.flatnonzero(breaks) + 1
+        return (
+            np.insert(coordinate_0, insertion_indices, np.nan),
+            np.insert(coordinate_1, insertion_indices, np.nan),
+        )
+
+    for particle in particle_indices:
+        coordinate_0, coordinate_1 = plotted_coordinates(particle)
+        ax.plot(
+            coordinate_0,
+            coordinate_1,
+            lw=line_width,
+            alpha=line_alpha,
+        )
+        ax.scatter(
+            r_history[0, axis_0, particle],
+            r_history[0, axis_1, particle],
+            s=start_size,
+            c=start_color,
+            alpha=marker_alpha,
+        )
+        ax.scatter(
+            r_history[-1, axis_0, particle],
+            r_history[-1, axis_1, particle],
+            s=end_size,
+            c=end_color,
+            alpha=marker_alpha,
+        )
+
+    if axis_limits is None and config is not None:
+        if all(side_names[axis] in config for axis in plot_axes):
+            axis_limits = ((0.0, float(config[side_names[axis_0]])),
+                           (0.0, float(config[side_names[axis_1]])),
+            )
+
+    if axis_limits is not None:
+        ax.set_xlim(*axis_limits[0])
+        ax.set_ylim(*axis_limits[1])
+        
+    ax.set_xlabel(fr"${axis_names[axis_0]}$")
+    ax.set_ylabel(fr"${axis_names[axis_1]}$")
+
+    if equal_aspect:
+        ax.set_aspect("equal", adjustable="box")
+    if grid:
+        ax.grid(True, alpha=0.2)       
