@@ -119,7 +119,8 @@ def simulation_time_axis(r, config, t_offset=0.0):
 
 mask_t = (lower < r[:, 1, :]) & (r[:, 1, :] < upper)
 cell_count_t = np.sum(mask_t, axis=1)
-cell_fraction_t = cell_count_t / config["N"]
+vol_frac = (upper-lower)/config["Ly"]
+cell_fraction_t = cell_count_t / (config["N"] * vol_frac)
 t = simulation_time_axis(r,config)
 
 
