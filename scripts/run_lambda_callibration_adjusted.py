@@ -48,7 +48,7 @@ r_init, n_init = geometry.random_initial_conditions()
 
 
 # Creating the benchmark cell-fraction spline
-data_path = Path("data/nb_of_cells_reg.csv")
+data_path = Path("data/nb_of_cells_reg_offset.csv")
 df = pd.read_csv(data_path)
 
 t_calibr = df["time"].to_numpy()

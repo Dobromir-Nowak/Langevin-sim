@@ -9,12 +9,12 @@ w0: 1. # scale of angular velocity
 vec_I: [1., 0., 0.] # light direction (unit vector)
 
 # Simulation parameters
-dt: 0.01 # time step
-Nt: 17000 # number of time steps
-N: 32000 # number of samples/ABPs
+dt: 0.1 # time step
+Nt: 1300 # number of time steps
+N: 8000 # number of samples/ABPs
 
 # Saving
-save_every: 20
+save_every: 100
 
 # Boundary conditions
 bc_type: "custom_bb" # "custom_bc" # boundary condition type ("bb" for standard bounce-back or "custom_bb" for custom bounce-back)
