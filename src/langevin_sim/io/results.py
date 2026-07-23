@@ -42,6 +42,7 @@ class ResultsManager:
                 writer="ffmpeg",
                 fps=fps,
                 dpi=dpi,
+                progress_callback=lambda i, n: print(f"\rFrame {i + 1}/{n}",end="",flush=True,),
                 codec="libx264",
                 extra_args=["-pix_fmt", "yuv420p", "-movflags", "+faststart"],
             )
