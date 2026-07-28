@@ -1,9 +1,24 @@
 ## How to use
-1. Clone github repo.
+1. Clone github repo and set project parent directory as current directory.
+
+```bash
+git clone https://github.com/Dobromir-Nowak/Langevin-sim
+cd Langevin-sim
+```
+
 2. Ensure packages from reqs.txt are installed.
-3. Set project parent directory as current directory.
-4. Run "pip install -e ."
-5. Any of the scripts and notebooks can now be run.
+
+```bash
+pip install -r reqs.txt
+```
+
+3. Install the package
+
+```bash
+pip install -e .
+```
+
+4. Any of the scripts can now be run.
 
 Jupyter notebooks (see folder `notebooks`) can be run without the above setup.
 
