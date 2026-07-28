@@ -7,7 +7,7 @@
 
 Jupyter notebooks (see folder `notebooks`) can be run without the above setup.
 
-## Example visualization
+## Example visualizations
 
 
 https://github.com/user-attachments/assets/3a903b2f-f78a-4e9e-aabb-1f389fb5c81d
@@ -15,6 +15,7 @@ https://github.com/user-attachments/assets/3a903b2f-f78a-4e9e-aabb-1f389fb5c81d
 <img width="2519" height="1079" alt="currents_theta_t=100,N=8000_page-0001" src="https://github.com/user-attachments/assets/f4106a28-46d1-480b-8a7a-3cb07456c6fb" />
 
 
+<img width="1444" height="1536" alt="trajectories0_page-0001" src="https://github.com/user-attachments/assets/354fd133-6c3c-45e0-971d-2f9a0ca9fc0f" />
 
 ## Branch status and archive policy
 
