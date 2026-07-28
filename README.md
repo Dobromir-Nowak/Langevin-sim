@@ -7,6 +7,12 @@
 
 Jupyter notebooks (see folder `notebooks`) can be run without the above setup.
 
+## Example visualization
+
+
+https://github.com/user-attachments/assets/3a903b2f-f78a-4e9e-aabb-1f389fb5c81d
+
+<img width="2519" height="1079" alt="currents_theta_t=100,N=8000_page-0001" src="https://github.com/user-attachments/assets/f4106a28-46d1-480b-8a7a-3cb07456c6fb" />
 
 
 
