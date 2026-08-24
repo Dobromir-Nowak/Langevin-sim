@@ -160,3 +160,43 @@ def F2(I: np.ndarray, sin_psi:np.ndarray):  # phenomenological approximation of 
 
 def F(I: np.ndarray, sin_psi: np.ndarray):
     return F2(I, sin_psi) - F1(I, sin_psi)
+
+def F1_exact(I: np.ndarray, sin_psi: np.ndarray):
+    """I * f1(x)/x, where x = I*sin_psi."""
+    x = I * sin_psi
+
+    out = np.empty_like(x, dtype=float)
+
+    small = x < 1e-4
+    regular = ~small
+
+    # small-x fallback
+    out[small] = F1(I[small], sin_psi[small])
+
+    # exact expression
+    xr = x[regular]
+    out[regular] = I[regular]/xr*(2*(1+xr**(-1))*np.log1p(xr) - 2)
+
+    return out
+
+def F2_exact(I: np.ndarray, sin_psi: np.ndarray):
+    """I * f2(x)/x, where x = I*sin_psi."""
+    x = I * sin_psi
+    out = np.empty_like(x, dtype=float)
+
+    small = x < 1e-4
+    over_1 = x > 1
+    mid = ~small & ~over_1
+
+    x_mid = x[mid]
+    x_over = x[over_1]
+
+    # three cases -- small, mid, over_1
+    out[small] = F2(I[small], sin_psi[small])
+    out[mid] = I[mid]/x_mid * (-2*x_mid**(-1) * ( np.sqrt(1-x_mid**2) * np.arccos(x_mid) - np.pi/2 ) - 2)
+    out[over_1] = I[over_1]/x_over * (2*x_over**(-1) * np.sqrt(x_over**2 - 1) * np.arccosh(x_over) + np.pi/2)
+
+    return out
+
+def F_exact(I: np.ndarray, sin_psi: np.ndarray):
+    return F2(I, sin_psi) - F1(I, sin_psi)

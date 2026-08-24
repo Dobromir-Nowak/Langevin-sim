@@ -17,11 +17,12 @@ from langevin_sim.physics.geometry import Cuboid
 parent_dir = Path(__file__).parent.parent
 plt.style.use(parent_dir / "softmatter.mplstyle")
 
-file_name = "cuboid_lambda_callibration"
-config_path = Path("configs") / f"{file_name}.yaml"
+file_name = Path(__file__).stem
+config_name = "cuboid_lambda_callibration"
+config_path = Path("configs") / f"{config_name}.yaml"
 config = load_config(config_path=config_path)
 
-f_fn = F
+f_fn = F_exact
 
 # Creating the spectrum spline
 import pandas as pd
@@ -90,7 +91,7 @@ axis = 1  # y
 
 # TODO: use a stronger iterative framework to choose I from an
 # interval iteratively and save the corresponding calibration data.
-I_vals = np.linspace(0.5, 20.0, 11)
+I_vals = np.linspace(0.5, 40.0, 11)
 
 # Keep only the one-dimensional observables required for the final plot,
 # rather than retaining all trajectories from every simulation.
