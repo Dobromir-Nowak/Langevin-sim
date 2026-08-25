@@ -22,7 +22,7 @@ file_name = "cuboid_lambda_video"
 config_path = Path("configs") / f"{file_name}.yaml"
 config = load_config(config_path=config_path)
 
-f_fn = F
+f_fn = F_exact
 
 # Creating the spline
 import pandas as pd
