@@ -16,8 +16,6 @@ from langevin_sim.physics.geometry import Cuboid
 def plot_cell_fraction_curves_ax(
     ax,
     cell_fraction_curves,
-    lower,
-    upper,
     t_calibr,
     cell_fraction_calibr,
     calibr_spline,
@@ -37,7 +35,6 @@ def plot_cell_fraction_curves_ax(
             label=rf"$I={I:g}$",
         )
 
-    # benchmark
     t_calibr_dense = np.linspace(
         t_calibr.min(),
         t_calibr.max(),
@@ -131,6 +128,60 @@ calibr_spline = PchipInterpolator(
 
 
 
+
+
+
+
+def sim_run(config,
+            f_fn,
+            r0,
+            n0,
+            geometry,
+            lower,
+            upper,
+            I, 
+            D_r,):
+
+    # changing params:
+    config["D_r"] = D_r
+
+    def base_fn_spline(r: np.ndarray):
+        x_i = r[axis, :][None, :]
+        x_i_scaled = (x_i - lower) / (upper - lower)
+        x_i_scaled = 1.0 - x_i_scaled  # flip to match lambda from 800 to 400
+        return I * S(x_i_scaled)
+
+    I_fn = make_gated_intensity(
+        base_fn_spline,
+        axis=axis,
+        lower=lower,
+        upper=upper,
+    )
+
+    # the actual run
+
+    sim = Langevin_sim(
+        config,
+        I_fn=I_fn,
+        f_fn=f_fn,
+        r0=r_init,
+        n0=n_init,
+        geometry=geometry,
+    )
+    results = sim.run(save_every=config["save_every"])
+
+    r = results["r"]
+
+    mask_t = (lower < r[:, axis, :]) & (r[:, axis, :] < upper)
+    cell_count_t = np.sum(mask_t, axis=1)
+    vol_frac = (upper - lower) / config[axis_length_key]
+    cell_fraction_t = cell_count_t / (config["N"] * vol_frac)
+    t = simulation_time_axis(r, config)
+
+    return (I, D_r, t.copy(), cell_fraction_t.copy() )
+
+
+
 # ------------------------------------------------------------
 # Run simulation loop
 # ------------------------------------------------------------
@@ -139,61 +190,34 @@ calibr_spline = PchipInterpolator(
 axis = 1  # y
 
 
-half_widths = [37.5] # [37.5, 100, 200, 400, 600, 800] # [100, 200] 
-ranges = [ (1000-half_width, 1000+half_width) for half_width in half_widths]
+lower = 1000 # 900
+upper = 1075 # 1100
+
+I_vals = np.linspace(0.5, 40.0, 5)
+D_r_vals = [0.02, 0.067] # np.geomspace(0.005, 0.4, 9)
+
 
 # TODO: use a stronger iterative framework to choose I from an
 # interval iteratively and save the corresponding calibration data.
 
 axis_length_key = ("Lx", "Ly", "Lz")[axis]
 
-I_vals = np.array([10.]) # np.linspace(0.5, 40.0, 5)
 
 pc = PlotCollector()
 
 
-for lower, upper in ranges:
+for D_r in D_r_vals:
 
     # Keep only the one-dimensional observables required for the final plot,
     # rather than retaining all trajectories from every simulation.
-    cell_fraction_curves = []
-
-    vol_frac = (upper - lower) / config[axis_length_key]
 
     for I in I_vals:
-        def base_fn_spline(r: np.ndarray):
-            x_i = r[axis, :][None, :]
-            x_i_scaled = (x_i - lower) / (upper - lower)
-            x_i_scaled = 1.0 - x_i_scaled  # flip to match lambda from 800 to 400
-            return I * S(x_i_scaled)
+        _ = sim_run(config, f_fn, r_init, n_init, geometry, lower, upper, I, D_r,)
 
-        I_fn = make_gated_intensity(
-            base_fn_spline,
-            axis=axis,
-            lower=lower,
-            upper=upper,
-        )
+        # TODO: save _ to a list and create a right function to pass it to
 
-        sim = Langevin_sim(
-            config,
-            I_fn=I_fn,
-            f_fn=f_fn,
-            r0=r_init,
-            n0=n_init,
-            geometry=geometry,
-        )
-        results = sim.run(save_every=config["save_every"])
 
-        r = results["r"]
-
-        mask_t = (lower < r[:, axis, :]) & (r[:, axis, :] < upper)
-        cell_count_t = np.sum(mask_t, axis=1)
-        cell_fraction_t = cell_count_t / (config["N"] * vol_frac)
-        t = simulation_time_axis(r, config)
-
-        cell_fraction_curves.append(
-            (float(I), t.copy(), cell_fraction_t.copy())
-        )
+    
 
     # One subplot for this (lower, upper) pair
     pc.add(

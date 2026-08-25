@@ -68,8 +68,8 @@ calibr_spline = PchipInterpolator(t_calibr, cell_fraction_calibr, extrapolate=Fa
 
 # Intensity profile params
 
-lower = 500
-upper = 1500
+lower = 200
+upper = 275
 axis = 1 # y 
 
 
@@ -81,8 +81,6 @@ video_n_show = int(config["N"])
 
 # Style override
 plt.style.use("default")
-#TODO use a stronger iterative framework -- choose "I" from an interval iteratively
-#    (+ save the data)
 
 I_vals = np.array([10.]) #np.linspace(0.5, 20., 11) np.array([10.])
 for I in I_vals:
@@ -112,7 +110,7 @@ for I in I_vals:
         r,
         config=config,
         excluded_axis=2,
-        n_show=50,
+        n_show=200,
         frame_stride=1,
         trail_length=10,
         fps=25,

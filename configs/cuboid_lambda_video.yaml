@@ -30,5 +30,5 @@ I: 1
 
 # Cuboid parameters
 Lx: 200. # length of the cuboid in x-direction
-Ly: 2000. # length of the cuboid in y-direction
-Lz: 2. # length of the cuboid in z-direction
+Ly: 500. # length of the cuboid in y-direction
+Lz: 20. # length of the cuboid in z-direction

@@ -29,9 +29,11 @@ class PlotCollector:
             raise ValueError("unknown layout")
 
         fig, axes = plt.subplots(nrows, ncols,
-                                 figsize=(5*ncols, 4*nrows),
-                                 squeeze=False,
-                                 sharex=sharex, sharey=sharey)
+                                figsize=(5*ncols, 4.5*nrows),
+                                squeeze=False,
+                                sharex=sharex,
+                                sharey=sharey,
+                                layout="constrained")
 
         axes = axes.flatten()
 

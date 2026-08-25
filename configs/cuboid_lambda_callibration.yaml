@@ -11,7 +11,7 @@ vec_I: [1., 0., 0.] # light direction (unit vector)
 # Simulation parameters
 dt: 0.1 # time step
 Nt: 1300 # number of time steps
-N: 8000 # number of samples/ABPs
+N: 16000 #8000 # number of samples/ABPs
 
 # Saving
 save_every: 100
@@ -31,4 +31,4 @@ I: 1
 # Cuboid parameters
 Lx: 200. # length of the cuboid in x-direction
 Ly: 2000. # length of the cuboid in y-direction
-Lz: 2. # length of the cuboid in z-direction
+Lz: 20. # length of the cuboid in z-direction
